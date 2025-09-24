@@ -1,12 +1,66 @@
 <header>
-  <h2 class="header__title">
-    {{ shop.name | link_to: routes.root_url }}
-  </h2>
+  <div class="header__left">
+    <h2 class="header__title">
+      {{ shop.name | link_to: routes.root_url }}
+    </h2>
 
-  <div class="header__menu">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
+    <nav class="header__menu">
+      {% for link in section.settings.menu.links %}
+        {% if link.links != blank %}
+          <div class="header__menu-item has-dropdown">
+            {{ link.title | link_to: link.url, class: 'header__menu-link' }}
+
+            <div class="mega-menu">
+              <div class="mega-menu__wrapper">
+                <div class="mega-menu__categories">
+                  <h3 class="mega-menu__title">{{ link.title }}</h3>
+                  <ul class="mega-menu__list">
+                    {% for child_link in link.links %}
+                      <li class="mega-menu__item" data-category="{{ child_link.title | handleize }}">
+                        {{ child_link.title | link_to: child_link.url, class: 'mega-menu__link' }}
+                        {% if child_link.links != blank %}
+                          <span class="mega-menu__arrow">→</span>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+
+                  {% if section.settings.show_view_all %}
+                    <a href="{{ link.url }}" class="mega-menu__view-all">
+                      {{ 'general.menu.shop_all' | t }}
+                    </a>
+                  {% endif %}
+                </div>
+
+                {% if section.blocks.size > 0 %}
+                  <div class="mega-menu__featured">
+                    <div class="mega-menu__featured-grid">
+                      {% for block in section.blocks %}
+                        {% if block.settings.menu_item == link.title %}
+                          <a href="{{ block.settings.product_url }}"
+                             class="mega-menu__product"
+                             data-category="{{ block.settings.category | default: 'all' | handleize }}"
+                             {{ block.shopify_attributes }}>
+                            {% if block.settings.product_image %}
+                              <div class="mega-menu__product-image">
+                                {{ block.settings.product_image | image_url: width: 400, height: 400 | image_tag }}
+                              </div>
+                            {% endif %}
+                            <h4 class="mega-menu__product-title">{{ block.settings.product_title }}</h4>
+                          </a>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+          {{ link.title | link_to: link.url, class: 'header__menu-link' }}
+        {% endif %}
+      {% endfor %}
+    </nav>
   </div>
 
   <div class="header__icons">
@@ -30,6 +84,17 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: relative;
+    z-index: 100;
+  }
+  header .header__left {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+    height: 100%;
+  }
+  header .header__title {
+    margin: 0;
   }
   header a {
     position: relative;
@@ -45,12 +110,259 @@
   header svg {
     width: 2rem;
   }
-  header .header__menu,
+  header .header__menu {
+    display: flex;
+    gap: 50px;
+    height: 100%;
+    align-items: center;
+  }
+
+  /* Menu items and links */
+  .header__menu-item {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .header__menu-link,
+  .header__menu > a {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    padding: 0;
+  }
+
+  .header__menu-link::after,
+  .header__menu > a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-foreground);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .header__menu-item:hover .header__menu-link::after,
+  .header__menu > a:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Mega Menu */
+  .mega-menu {
+    position: absolute;
+    top: 100%;
+    left: -50px;
+    background: var(--color-background);
+    border: 1px solid var(--color-border, #e5e5e5);
+    border-top: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    min-width: 800px;
+  }
+
+  .header__menu-item:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .mega-menu__wrapper {
+    display: flex;
+    padding: 2rem;
+    gap: 3rem;
+  }
+
+  /* Categories Section */
+  .mega-menu__categories {
+    flex: 0 0 300px;
+    border-right: 1px solid var(--color-border, #e5e5e5);
+    padding-right: 3rem;
+  }
+
+  .mega-menu__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 1.5rem 0;
+    color: var(--color-foreground-secondary, #666);
+  }
+
+  .mega-menu__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .mega-menu__item {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.25rem 0.5rem;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .mega-menu__item.active,
+  .mega-menu__item:hover {
+    background-color: var(--color-background-secondary, #f5f5f5);
+  }
+
+  .mega-menu__link {
+    font-size: 1rem;
+    color: var(--color-foreground);
+    transition: color 0.2s ease;
+    display: inline-block;
+  }
+
+  .mega-menu__link:hover {
+    color: var(--color-primary, #000);
+    text-decoration: underline;
+  }
+
+  .mega-menu__link::after {
+    display: none;
+  }
+
+  .mega-menu__arrow {
+    color: var(--color-foreground-secondary, #999);
+    font-size: 0.875rem;
+  }
+
+  .mega-menu__view-all {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.75rem 2rem;
+    background: var(--color-primary, #000);
+    color: var(--color-background);
+    border-radius: 25px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+  }
+
+  .mega-menu__view-all:hover {
+    opacity: 0.8;
+  }
+
+  /* Featured Products */
+  .mega-menu__featured {
+    flex: 1;
+  }
+
+  .mega-menu__featured-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .mega-menu__product {
+    display: block;
+    text-decoration: none;
+  }
+
+  .mega-menu__product-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--color-background-secondary, #f5f5f5);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .mega-menu__product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .mega-menu__product:hover .mega-menu__product-image img {
+    transform: scale(1.05);
+  }
+
+  .mega-menu__product-title {
+    font-size: 0.875rem;
+    text-align: center;
+    color: var(--color-foreground);
+    margin: 0;
+    font-weight: 400;
+  }
+
   header .header__icons {
     display: flex;
     gap: 1rem;
   }
 {% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('DOMContentLoaded', function() {
+    const megaMenus = document.querySelectorAll('.mega-menu');
+
+    megaMenus.forEach(function(menu) {
+      const categoryItems = menu.querySelectorAll('.mega-menu__item[data-category]');
+      const products = menu.querySelectorAll('.mega-menu__product');
+
+      // Show all products initially
+      function showAllProducts() {
+        products.forEach(function(product) {
+          product.style.display = 'block';
+        });
+      }
+
+      // Show products for specific category
+      function showCategoryProducts(category) {
+        products.forEach(function(product) {
+          const productCategory = product.getAttribute('data-category');
+          if (productCategory === category || productCategory === 'all') {
+            product.style.display = 'block';
+          } else {
+            product.style.display = 'none';
+          }
+        });
+      }
+
+      // Add hover listeners to category items
+      categoryItems.forEach(function(item) {
+        item.addEventListener('mouseenter', function() {
+          const category = this.getAttribute('data-category');
+          showCategoryProducts(category);
+
+          // Add active class for styling
+          categoryItems.forEach(function(cat) {
+            cat.classList.remove('active');
+          });
+          this.classList.add('active');
+        });
+      });
+
+      // Show all products when leaving categories area
+      const categoriesArea = menu.querySelector('.mega-menu__categories');
+      if (categoriesArea) {
+        categoriesArea.addEventListener('mouseleave', function() {
+          showAllProducts();
+          categoryItems.forEach(function(cat) {
+            cat.classList.remove('active');
+          });
+        });
+      }
+
+      // Initially show all products
+      showAllProducts();
+    });
+  });
+{% endjavascript %}
 
 {% schema %}
 {
@@ -60,6 +372,48 @@
       "type": "link_list",
       "id": "menu",
       "label": "t:labels.menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "t:general.menu.show_shop_all",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "featured_product",
+      "name": "t:general.menu.featured_product",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item",
+          "label": "t:general.menu.parent_menu_item",
+          "info": "t:general.menu.parent_menu_item_info"
+        },
+        {
+          "type": "text",
+          "id": "category",
+          "label": "t:general.menu.category",
+          "info": "t:general.menu.category_info",
+          "default": "all"
+        },
+        {
+          "type": "text",
+          "id": "product_title",
+          "label": "t:labels.product_title"
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "t:labels.product_url"
+        },
+        {
+          "type": "image_picker",
+          "id": "product_image",
+          "label": "t:labels.product_image"
+        }
+      ]
     }
   ]
 }

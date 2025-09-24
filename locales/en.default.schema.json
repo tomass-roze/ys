@@ -19,6 +19,15 @@
     "header": "Header",
     "layout": "Layout",
     "main": "Main",
+    "menu": {
+      "shop_all": "Shop all",
+      "show_shop_all": "Show 'Shop all' button",
+      "featured_product": "Featured product",
+      "parent_menu_item": "Parent menu item",
+      "parent_menu_item_info": "Enter the exact name of the parent menu item this product should appear under",
+      "category": "Category",
+      "category_info": "Enter the category name this product belongs to, or 'all' to show in all categories"
+    },
     "page": "Page",
     "password": "Password",
     "primary": "Primary",
@@ -45,6 +54,9 @@
     "padding": "Padding",
     "page_margin": "Page margin",
     "page_width": "Page width",
+    "product_title": "Product title",
+    "product_url": "Product URL",
+    "product_image": "Product image",
     "show_payment_icons": "Show payment icons",
     "text_style": "Text style",
     "text": "Text"
@@ -71,6 +83,6 @@
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
-    },
+    }
   }
 }
