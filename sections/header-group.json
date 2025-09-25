@@ -13,10 +13,25 @@
   "sections": {
     "header": {
       "type": "header",
-      "settings": {}
+      "settings": {
+        "menu": "main-menu",
+        "show_view_all": true
+      }
+    },
+    "announcement_bar_67cJGn": {
+      "type": "announcement-bar",
+      "name": "t:general.announcement_bar",
+      "settings": {
+        "announcement_text": "<p>Welcome to our store! Free shipping on orders over $50.</p>",
+        "background_color": "#1a1a1a",
+        "text_color": "#ffffff",
+        "announcement_link": "",
+        "font_size": 14
+      }
     }
   },
   "order": [
+    "announcement_bar_67cJGn",
     "header"
-  ],
+  ]
 }
