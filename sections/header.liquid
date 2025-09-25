@@ -22,6 +22,17 @@
     margin-left: -1.2rem;
   }
 
+  /* Lucide icon adjustments */
+  .header__icon .lucide {
+    width: 20px;
+    height: 20px;
+  }
+
+  .header__search .lucide {
+    width: 18px;
+    height: 18px;
+  }
+
   {%- if section.settings.sticky_header_type == 'reduce-logo-size' -%}
     .scrolled-past-header .header__heading-logo-wrapper {
       width: 75%;
@@ -143,7 +154,9 @@
       endif
 
       if section.settings.logo_position == 'top-center' or section.settings.menu == blank
-        render 'header-search', input_id: 'Search-In-Modal-1'
+        unless section.settings.hide_search
+          render 'header-search', input_id: 'Search-In-Modal-1'
+        endunless
       endif
     -%}
 
@@ -247,7 +260,9 @@
           </localization-form>
         {%- endif -%}
       </div>
-      {% render 'header-search', input_id: 'Search-In-Modal' %}
+      {%- unless section.settings.hide_search -%}
+        {% render 'header-search', input_id: 'Search-In-Modal' %}
+      {%- endunless -%}
 
       {%- if shop.customer_accounts_enabled -%}
         <a
@@ -260,11 +275,11 @@
               {%- if customer and customer.has_avatar? -%}
                 {{ customer | avatar }}
               {%- else -%}
-                <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+                <span class="svg-wrapper">{%- render 'lucide-icon', icon: 'user', size: 20, class: 'icon icon-account' -%}</span>
               {%- endif -%}
             </account-icon>
           {%- else -%}
-            <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+            <span class="svg-wrapper">{%- render 'lucide-icon', icon: 'user', size: 20, class: 'icon icon-account' -%}</span>
           {%- endif -%}
           <span class="visually-hidden">
             {%- liquid
@@ -287,9 +302,9 @@
 
       <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
         {% if cart == empty %}
-          <span class="svg-wrapper">{{ 'icon-cart-empty.svg' | inline_asset_content }}</span>
+          <span class="svg-wrapper">{%- render 'lucide-icon', icon: 'shopping-bag', size: 20, class: 'icon icon-cart-empty' -%}</span>
         {% else %}
-          <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
+          <span class="svg-wrapper">{%- render 'lucide-icon', icon: 'shopping-bag', size: 20, class: 'icon icon-cart' -%}</span>
         {% endif %}
         <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
         {%- if cart != empty -%}
@@ -609,6 +624,13 @@
       "default": true,
       "label": "t:sections.header.settings.enable_customer_avatar.label",
       "info": "t:sections.header.settings.enable_customer_avatar.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_search",
+      "default": false,
+      "label": "t:sections.header.settings.hide_search.label",
+      "info": "t:sections.header.settings.hide_search.info"
     },
     {
       "type": "header",

@@ -117,12 +117,12 @@
                 aria-label="{{ 'general.search.reset' | t }}"
               >
                 <span class="svg-wrapper">
-                  {{- 'icon-reset.svg' | inline_asset_content -}}
+                  {%- render 'lucide-icon', icon: 'x-circle', size: 18, class: 'icon icon-reset' -%}
                 </span>
               </button>
               <button type="submit" class="search__button field__button" aria-label="{{ 'general.search.search' | t }}">
                 <span class="svg-wrapper">
-                  {{- 'icon-search.svg' | inline_asset_content -}}
+                  {%- render 'lucide-icon', icon: 'search', size: 18, class: 'icon icon-search' -%}
                 </span>
               </button>
             </div>

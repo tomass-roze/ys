@@ -12,8 +12,8 @@
       aria-label="{{ 'sections.header.menu' | t }}"
     >
       <span>
-        {{- 'icon-hamburger.svg' | inline_asset_content -}}
-        {{- 'icon-close.svg' | inline_asset_content -}}
+        {%- render 'lucide-icon', icon: 'menu', size: 20, class: 'icon icon-hamburger' -%}
+        {%- render 'lucide-icon', icon: 'x', size: 20, class: 'icon icon-close' -%}
       </span>
     </summary>
     <div id="menu-drawer" class="gradient menu-drawer motion-reduce color-{{ section.settings.menu_color_scheme }}">
@@ -31,10 +31,10 @@
                       >
                         {{ link.title | escape }}
                         <span class="svg-wrapper">
-                          {{- 'icon-arrow.svg' | inline_asset_content -}}
+                          {%- render 'lucide-icon', icon: 'arrow-right', size: 16, class: 'icon icon-arrow' -%}
                         </span>
                         <span class="svg-wrapper">
-                          {{- 'icon-caret.svg' | inline_asset_content -}}
+                          {%- render 'lucide-icon', icon: 'chevron-down', size: 16, class: 'icon icon-caret' -%}
                         </span>
                       </summary>
                       <div
@@ -45,7 +45,7 @@
                         <div class="menu-drawer__inner-submenu">
                           <button class="menu-drawer__close-button link link--text focus-inset" aria-expanded="true">
                             <span class="svg-wrapper">
-                              {{- 'icon-arrow.svg' | inline_asset_content -}}
+                              {%- render 'lucide-icon', icon: 'arrow-right', size: 16, class: 'icon icon-arrow' -%}
                             </span>
                             {{ link.title | escape }}
                           </button>
@@ -71,10 +71,10 @@
                                     >
                                       {{ childlink.title | escape }}
                                       <span class="svg-wrapper">
-                                        {{- 'icon-arrow.svg' | inline_asset_content -}}
+                                        {%- render 'lucide-icon', icon: 'arrow-right', size: 16, class: 'icon icon-arrow' -%}
                                       </span>
                                       <span class="svg-wrapper">
-                                        {{- 'icon-caret.svg' | inline_asset_content -}}
+                                        {%- render 'lucide-icon', icon: 'chevron-down', size: 16, class: 'icon icon-caret' -%}
                                       </span>
                                     </summary>
                                     <div
@@ -86,7 +86,7 @@
                                         aria-expanded="true"
                                       >
                                         <span class="svg-wrapper">
-                                          {{- 'icon-arrow.svg' | inline_asset_content -}}
+                                          {%- render 'lucide-icon', icon: 'arrow-right', size: 16, class: 'icon icon-arrow' -%}
                                         </span>
                                         {{ childlink.title | escape }}
                                       </button>
@@ -148,13 +148,13 @@
                       {{ customer | avatar }}
                     {%- else -%}
                       <span class="svg-wrapper">
-                        {{- 'icon-account.svg' | inline_asset_content -}}
+                        {%- render 'lucide-icon', icon: 'user', size: 20, class: 'icon icon-account' -%}
                       </span>
                     {%- endif -%}
                   </account-icon>
                 {%- else -%}
                   <span class="svg-wrapper">
-                    {{- 'icon-account.svg' | inline_asset_content -}}
+                    {%- render 'lucide-icon', icon: 'user', size: 20, class: 'icon icon-account' -%}
                   </span>
                 {%- endif -%}
                 {%- liquid
