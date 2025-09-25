@@ -45,6 +45,7 @@
   },
   "labels": {
     "alignment": "Alignment",
+    "announcement_link": "Announcement link",
     "announcement_text": "Announcement text",
     "background": "Background",
     "background_color": "Background color",

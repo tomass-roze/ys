@@ -6,9 +6,17 @@
       --announcement-font-size: {{ section.settings.font_size }}px;
     "
   >
-    <div class="announcement-bar__content">
-      {{ section.settings.announcement_text }}
-    </div>
+    {% if section.settings.announcement_link != blank %}
+      <a href="{{ section.settings.announcement_link }}" class="announcement-bar__link">
+        <div class="announcement-bar__content">
+          {{ section.settings.announcement_text }}
+        </div>
+      </a>
+    {% else %}
+      <div class="announcement-bar__content">
+        {{ section.settings.announcement_text }}
+      </div>
+    {% endif %}
   </div>
 {% endif %}
 
@@ -31,12 +39,25 @@
     padding: 0 var(--page-margin);
   }
 
-  .announcement-bar a {
+  .announcement-bar__link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .announcement-bar__link:hover {
+    opacity: 0.9;
+  }
+
+  /* Style for inline links within the rich text */
+  .announcement-bar__content a {
     color: inherit;
     text-decoration: underline;
   }
 
-  .announcement-bar a:hover {
+  .announcement-bar__content a:hover {
     opacity: 0.8;
   }
 
@@ -69,6 +90,11 @@
       "id": "text_color",
       "label": "t:labels.text_color",
       "default": "#ffffff"
+    },
+    {
+      "type": "url",
+      "id": "announcement_link",
+      "label": "t:labels.announcement_link"
     },
     {
       "type": "range",
