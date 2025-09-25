@@ -1,0 +1,90 @@
+{% if section.settings.announcement_text != blank %}
+  <div class="announcement-bar"
+    style="
+      --announcement-bg-color: {{ section.settings.background_color }};
+      --announcement-text-color: {{ section.settings.text_color }};
+      --announcement-font-size: {{ section.settings.font_size }}px;
+    "
+  >
+    <div class="announcement-bar__content">
+      {{ section.settings.announcement_text }}
+    </div>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .announcement-bar {
+    background-color: var(--announcement-bg-color);
+    color: var(--announcement-text-color);
+    font-size: var(--announcement-font-size);
+    width: 100%;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    line-height: 1.5;
+    position: relative;
+    z-index: 99;
+  }
+
+  .announcement-bar__content {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--page-margin);
+  }
+
+  .announcement-bar a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .announcement-bar a:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    .announcement-bar {
+      font-size: calc(var(--announcement-font-size) * 0.875);
+      padding: 0.5rem 0.75rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.announcement_bar",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "announcement_text",
+      "label": "t:labels.announcement_text",
+      "default": "<p>Welcome to our store! Free shipping on orders over $50.</p>"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:labels.background_color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:labels.text_color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "t:labels.font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.announcement_bar"
+    }
+  ]
+}
+{% endschema %}

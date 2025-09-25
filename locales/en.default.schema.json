@@ -1,6 +1,7 @@
 {
   "general": {
     "404": "Not found",
+    "announcement_bar": "Announcement bar",
     "article": "Article",
     "block": "Block",
     "blog": "Blog",
@@ -44,8 +45,11 @@
   },
   "labels": {
     "alignment": "Alignment",
+    "announcement_text": "Announcement text",
     "background": "Background",
+    "background_color": "Background color",
     "foreground": "Foreground",
+    "font_size": "Font size",
     "grid_gap": "Grid spacing",
     "grid_item_width": "Grid item width",
     "input_corner_radius": "Input corner radius",
@@ -58,6 +62,7 @@
     "product_url": "Product URL",
     "product_image": "Product image",
     "show_payment_icons": "Show payment icons",
+    "text_color": "Text color",
     "text_style": "Text style",
     "text": "Text"
   },
