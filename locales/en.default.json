@@ -4,6 +4,9 @@
       "shop_all": "Shop all"
     }
   },
+  "announcement_bar": {
+    "default_text": "Welcome to our store!"
+  },
   "404": {
     "title": "404",
     "not_found": "Page not found.",
