@@ -33,8 +33,26 @@
   "cart": {
     "checkout": "Checkout",
     "title": "Cart",
+    "your_cart": "Your cart",
     "update": "Update",
-    "remove": "Remove"
+    "remove": "Remove",
+    "empty": "Your cart is empty",
+    "continue_shopping": "Continue shopping",
+    "quantity": "Quantity",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "item_added": "Item added to cart",
+    "item_removed": "Item removed from cart",
+    "view_cart": "View cart",
+    "close": "Close cart",
+    "free_shipping_threshold": "You're {{ amount }} away from free shipping",
+    "free_shipping_success": "You've unlocked free shipping!",
+    "recommendations_title": "You may also like",
+    "upgrade_to_subscription": "Upgrade to subscription & save {{ percentage }}%",
+    "subscription_frequency": "Delivery frequency",
+    "subscription_upgrade": "Upgrade to subscription",
+    "one_time_purchase": "One-time purchase",
+    "subscribe_and_save": "Subscribe & save"
   },
   "customers": {
     "login": {

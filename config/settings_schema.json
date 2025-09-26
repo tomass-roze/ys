@@ -79,5 +79,72 @@
         "default": 4
       }
     ]
+  },
+  {
+    "name": "t:general.cart",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "t:labels.cart_type",
+        "options": [
+          {
+            "value": "page",
+            "label": "t:options.cart_page"
+          },
+          {
+            "value": "drawer",
+            "label": "t:options.cart_drawer"
+          }
+        ],
+        "default": "drawer"
+      },
+      {
+        "type": "text",
+        "id": "cart_announcement",
+        "label": "t:labels.cart_announcement",
+        "default": "Free shipping on orders over $50!",
+        "info": "t:info.cart_announcement"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_free_shipping_threshold",
+        "label": "t:labels.show_free_shipping_threshold",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "free_shipping_threshold",
+        "label": "t:labels.free_shipping_threshold",
+        "default": "50",
+        "info": "t:info.free_shipping_threshold"
+      },
+      {
+        "type": "text",
+        "id": "free_shipping_message",
+        "label": "t:labels.free_shipping_message",
+        "default": "You're {amount} away from free shipping!",
+        "info": "t:info.free_shipping_message"
+      },
+      {
+        "type": "text",
+        "id": "free_shipping_success_message",
+        "label": "t:labels.free_shipping_success_message",
+        "default": "You qualify for free shipping!",
+        "info": "t:info.free_shipping_success_message"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_cart_recommendations",
+        "label": "t:labels.show_cart_recommendations",
+        "default": true
+      },
+      {
+        "type": "collection",
+        "id": "cart_recommendations_collection",
+        "label": "t:labels.cart_recommendations_collection",
+        "info": "t:info.cart_recommendations_collection"
+      }
+    ]
   }
 ]

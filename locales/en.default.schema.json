@@ -76,6 +76,14 @@
     "text_color": "Text color",
     "text_style": "Text style",
     "text": "Text",
+    "cart_type": "Cart type",
+    "cart_announcement": "Cart announcement",
+    "show_free_shipping_threshold": "Show free shipping progress",
+    "free_shipping_threshold": "Free shipping threshold",
+    "free_shipping_message": "Free shipping message",
+    "free_shipping_success_message": "Free shipping success message",
+    "show_cart_recommendations": "Show product recommendations",
+    "cart_recommendations_collection": "Recommendations collection",
     "images_header": "Images",
     "desktop_image": "Desktop image",
     "mobile_image": "Mobile image",
@@ -129,6 +137,8 @@
       "subtitle": "Subtitle",
       "normal": "Normal text"
     },
+    "cart_page": "Cart page",
+    "cart_drawer": "Cart drawer",
     "content_position": {
       "top_left": "Top left",
       "top_center": "Top center",
@@ -144,5 +154,12 @@
       "primary": "Primary",
       "secondary": "Secondary"
     }
+  },
+  "info": {
+    "cart_announcement": "Text shown at the top of the cart drawer",
+    "free_shipping_threshold": "Order amount required for free shipping (numeric value)",
+    "free_shipping_message": "Use {amount} as placeholder for remaining amount",
+    "free_shipping_success_message": "Message shown when free shipping is achieved",
+    "cart_recommendations_collection": "Collection to use for product recommendations in cart"
   }
 }

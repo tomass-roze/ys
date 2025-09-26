@@ -1,0 +1,427 @@
+{% doc %}
+  Renders product recommendations carousel, excluding items already in cart.
+
+  @param {collection} [collection] - Collection to get recommendations from
+  @param {number} [limit] - Number of products to show (default: 4)
+
+  @example
+  {% render 'cart-recommendations', collection: collections.all, limit: 4 %}
+{% enddoc %}
+
+{% liquid
+  assign recommendation_limit = limit | default: 4
+  assign recommendation_collection = collection | default: collections.all
+
+  if recommendation_collection == blank
+    assign recommendation_collection = collections.all
+  endif
+
+  assign cart_product_ids = cart.items | map: 'product_id'
+  assign recommended_products = ''
+  assign recommendations_count = 0
+
+  for product in recommendation_collection.products limit: 20
+    unless cart_product_ids contains product.id
+      if recommendations_count < recommendation_limit
+        if recommended_products == ''
+          assign recommended_products = product
+        else
+          assign recommended_products = recommended_products | append: ',' | append: product
+        endif
+        assign recommendations_count = recommendations_count | plus: 1
+      endif
+    endunless
+  endfor
+
+  assign recommended_products = recommended_products | split: ','
+%}
+
+{% if recommended_products.size > 0 %}
+  <div class="cart-recommendations">
+    <h3 class="cart-recommendations__title">{{ 'cart.recommendations_title' | t }}</h3>
+
+    <div class="cart-recommendations__carousel" data-recommendations-carousel>
+      <button type="button" class="cart-recommendations__nav cart-recommendations__nav--prev" data-carousel-prev aria-label="Previous">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </button>
+
+      <div class="cart-recommendations__track" data-carousel-track>
+        <div class="cart-recommendations__list" data-carousel-list>
+          {% for product in recommended_products %}
+            <div class="cart-recommendations__item" data-carousel-item>
+              <div class="cart-recommendations__product">
+                <a href="{{ product.url }}" class="cart-recommendations__image-link">
+                  {% if product.featured_image %}
+                    {{ product.featured_image | image_url: width: 200, height: 200, crop: 'center' | image_tag: loading: 'lazy', alt: product.title, class: 'cart-recommendations__image' }}
+                  {% else %}
+                    <div class="cart-recommendations__placeholder">
+                      {{ product.title | truncate: 2, '' | upcase }}
+                    </div>
+                  {% endif %}
+                </a>
+
+                <div class="cart-recommendations__info">
+                  <h4 class="cart-recommendations__product-title">
+                    <a href="{{ product.url }}">{{ product.title | truncate: 50 }}</a>
+                  </h4>
+
+                  <div class="cart-recommendations__price">
+                    {% if product.compare_at_price > product.price %}
+                      <span class="cart-recommendations__compare-price">{{ product.compare_at_price | money }}</span>
+                    {% endif %}
+                    <span class="cart-recommendations__current-price">{{ product.price | money }}</span>
+                  </div>
+
+                  <form action="/cart/add" method="post" class="cart-recommendations__form" data-quick-add-form>
+                    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+                    {% if product.variants.size > 1 %}
+                      <select name="id" class="cart-recommendations__variant-select" data-product-id="{{ product.id }}">
+                        {% for variant in product.variants %}
+                          {% if variant.available %}
+                            <option value="{{ variant.id }}" {% if variant == product.selected_or_first_available_variant %}selected{% endif %}>
+                              {{ variant.title }}
+                            </option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+                    {% endif %}
+
+                    <button type="submit" class="cart-recommendations__add-button" {% unless product.available %}disabled{% endunless %}>
+                      {% if product.available %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M10 5v10M5 10h10"/>
+                        </svg>
+                        <span>Add</span>
+                      {% else %}
+                        <span>Sold out</span>
+                      {% endif %}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <button type="button" class="cart-recommendations__nav cart-recommendations__nav--next" data-carousel-next aria-label="Next">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .cart-recommendations {
+    width: 100%;
+  }
+
+  .cart-recommendations__title {
+    margin: 0 0 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .cart-recommendations__carousel {
+    position: relative;
+  }
+
+  .cart-recommendations__track {
+    overflow: hidden;
+    margin: 0 -0.5rem;
+  }
+
+  .cart-recommendations__list {
+    display: flex;
+    transition: transform 0.3s ease;
+  }
+
+  .cart-recommendations__item {
+    flex: 0 0 50%;
+    padding: 0 0.5rem;
+  }
+
+  .cart-recommendations__product {
+    width: 100%;
+  }
+
+  .cart-recommendations__image-link {
+    display: block;
+    aspect-ratio: 1;
+    background: var(--color-background-secondary, #f5f5f5);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .cart-recommendations__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cart-recommendations__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-foreground-secondary, #999);
+  }
+
+  .cart-recommendations__info {
+    text-align: center;
+  }
+
+  .cart-recommendations__product-title {
+    margin: 0 0 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 400;
+  }
+
+  .cart-recommendations__product-title a {
+    color: var(--color-foreground);
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cart-recommendations__product-title a:hover {
+    text-decoration: underline;
+  }
+
+  .cart-recommendations__price {
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+  }
+
+  .cart-recommendations__compare-price {
+    color: var(--color-foreground-secondary, #666);
+    text-decoration: line-through;
+    margin-right: 0.5rem;
+  }
+
+  .cart-recommendations__current-price {
+    font-weight: 500;
+  }
+
+  .cart-recommendations__form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cart-recommendations__variant-select {
+    flex: 1;
+    padding: 0.375rem;
+    border: 1px solid var(--color-border, #e5e5e5);
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    background: var(--color-background);
+  }
+
+  .cart-recommendations__add-button {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    background: var(--color-primary, #000);
+    color: var(--color-background);
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .cart-recommendations__add-button:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+
+  .cart-recommendations__add-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .cart-recommendations__nav {
+    position: absolute;
+    top: 25%;
+    transform: translateY(-50%);
+    background: var(--color-background);
+    border: 1px solid var(--color-border, #e5e5e5);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: opacity 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .cart-recommendations__nav:hover:not(:disabled) {
+    opacity: 0.8;
+  }
+
+  .cart-recommendations__nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .cart-recommendations__nav--prev {
+    left: -1rem;
+  }
+
+  .cart-recommendations__nav--next {
+    right: -1rem;
+  }
+
+  @media (min-width: 768px) {
+    .cart-recommendations__item {
+      flex: 0 0 33.333%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .cart-recommendations__nav {
+      display: none;
+    }
+
+    .cart-recommendations__track {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+
+    .cart-recommendations__list {
+      padding-bottom: 0.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('DOMContentLoaded', () => {
+    const carousels = document.querySelectorAll('[data-recommendations-carousel]');
+
+    carousels.forEach(carousel => {
+      const track = carousel.querySelector('[data-carousel-track]');
+      const list = carousel.querySelector('[data-carousel-list]');
+      const items = carousel.querySelectorAll('[data-carousel-item]');
+      const prevButton = carousel.querySelector('[data-carousel-prev]');
+      const nextButton = carousel.querySelector('[data-carousel-next]');
+
+      if (!items.length) return;
+
+      let currentIndex = 0;
+      const itemWidth = 100 / (window.innerWidth > 768 ? 3 : 2);
+
+      function updateCarousel() {
+        const translateX = -currentIndex * itemWidth;
+        list.style.transform = `translateX(${translateX}%)`;
+
+        prevButton.disabled = currentIndex === 0;
+        nextButton.disabled = currentIndex >= items.length - (window.innerWidth > 768 ? 3 : 2);
+      }
+
+      if (prevButton && nextButton) {
+        prevButton.addEventListener('click', () => {
+          if (currentIndex > 0) {
+            currentIndex--;
+            updateCarousel();
+          }
+        });
+
+        nextButton.addEventListener('click', () => {
+          const visibleItems = window.innerWidth > 768 ? 3 : 2;
+          if (currentIndex < items.length - visibleItems) {
+            currentIndex++;
+            updateCarousel();
+          }
+        });
+
+        updateCarousel();
+      }
+    });
+
+    // Quick add to cart functionality
+    document.addEventListener('submit', async (e) => {
+      if (e.target.matches('[data-quick-add-form]')) {
+        e.preventDefault();
+
+        const form = e.target;
+        const button = form.querySelector('.cart-recommendations__add-button');
+        const originalButtonContent = button.innerHTML;
+
+        button.disabled = true;
+        button.innerHTML = '<span>Adding...</span>';
+
+        try {
+          const formData = new FormData(form);
+          const response = await fetch('/cart/add.js', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (response.ok) {
+            const item = await response.json();
+
+            // Update cart drawer if it exists
+            if (window.cartDrawer) {
+              window.cartDrawer.updateCart();
+              window.cartDrawer.open();
+            }
+
+            // Update cart count in header
+            updateCartCount();
+
+            button.innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M7 10l3 3 7-7"/></svg><span>Added</span>';
+
+            setTimeout(() => {
+              button.innerHTML = originalButtonContent;
+              button.disabled = false;
+            }, 2000);
+          } else {
+            throw new Error('Failed to add item');
+          }
+        } catch (error) {
+          console.error('Error adding item to cart:', error);
+          button.innerHTML = originalButtonContent;
+          button.disabled = false;
+        }
+      }
+    });
+
+    async function updateCartCount() {
+      try {
+        const response = await fetch('/cart.js');
+        const cart = await response.json();
+
+        const cartCounts = document.querySelectorAll('[data-cart-count]');
+        cartCounts.forEach(el => {
+          el.textContent = cart.item_count;
+          if (cart.item_count === 0) {
+            el.style.display = 'none';
+          } else {
+            el.style.display = '';
+          }
+        });
+      } catch (error) {
+        console.error('Error updating cart count:', error);
+      }
+    }
+  });
+{% endjavascript %}
