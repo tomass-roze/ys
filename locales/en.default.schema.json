@@ -50,7 +50,8 @@
     "sidebar": "Sidebar",
     "text": "Text",
     "theme": "Theme",
-    "typography": "Typography"
+    "typography": "Typography",
+    "hero_banner": "Hero banner"
   },
   "labels": {
     "alignment": "Alignment",
@@ -74,7 +75,36 @@
     "show_payment_icons": "Show payment icons",
     "text_color": "Text color",
     "text_style": "Text style",
-    "text": "Text"
+    "text": "Text",
+    "images_header": "Images",
+    "desktop_image": "Desktop image",
+    "mobile_image": "Mobile image",
+    "mobile_image_info": "Optional. If not set, desktop image will be used.",
+    "hero_image": "Hero image",
+    "image_overlay_opacity": "Image overlay opacity",
+    "content_settings": "Content settings",
+    "content_position": "Content position",
+    "content_padding": "Content padding",
+    "content_block_width": "Content block width",
+    "content_background_opacity": "Content background opacity",
+    "section_height": "Section height",
+    "desktop_height": "Desktop height",
+    "mobile_height": "Mobile height",
+    "heading": "Heading",
+    "heading_color": "Heading color",
+    "heading_font_size": "Heading font size",
+    "subheading": "Subheading",
+    "subheading_color": "Subheading color",
+    "subheading_font_size": "Subheading font size",
+    "paragraph": "Paragraph",
+    "text_font_size": "Text font size",
+    "button": "Button",
+    "button_label": "Button label",
+    "button_link": "Button link",
+    "button_style": "Button style",
+    "button_background_color": "Button background color",
+    "button_text_color": "Button text color",
+    "button_font_size": "Button font size"
   },
   "options": {
     "alignment": {
@@ -98,6 +128,21 @@
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
+    },
+    "content_position": {
+      "top_left": "Top left",
+      "top_center": "Top center",
+      "top_right": "Top right",
+      "middle_left": "Middle left",
+      "middle_center": "Middle center",
+      "middle_right": "Middle right",
+      "bottom_left": "Bottom left",
+      "bottom_center": "Bottom center",
+      "bottom_right": "Bottom right"
+    },
+    "button_style": {
+      "primary": "Primary",
+      "secondary": "Secondary"
     }
   }
 }

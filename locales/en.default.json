@@ -56,5 +56,11 @@
     "submit": "Search",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
+  },
+  "hero_banner": {
+    "default_heading": "Welcome to our store",
+    "default_subheading": "Discover amazing products",
+    "default_text": "Add a brief description about your store or promotion",
+    "default_button_label": "Shop now"
   }
 }

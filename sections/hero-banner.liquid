@@ -1,0 +1,590 @@
+<div class="hero-banner full-width"
+  style="
+    --hero-height-desktop: {{ section.settings.height_desktop }}px;
+    --hero-height-mobile: {{ section.settings.height_mobile }}px;
+    --overlay-opacity: {{ section.settings.overlay_opacity }}%;
+    --content-padding: {{ section.settings.content_padding }}px;
+    --content-bg-opacity: {{ section.settings.content_bg_opacity }}%;
+    --content-width: {{ section.settings.content_width }}px;
+  "
+>
+  {% assign has_mobile_image = section.settings.hero_image_mobile %}
+  {% assign has_desktop_image = section.settings.hero_image %}
+
+  {% if has_desktop_image or has_mobile_image %}
+    <div class="hero-banner__image-wrapper">
+      {% if has_desktop_image %}
+        {{ section.settings.hero_image | image_url: width: 1920 | image_tag:
+          loading: 'lazy',
+          sizes: '100vw',
+          widths: '375, 750, 1080, 1366, 1920, 2560, 3840',
+          class: 'hero-banner__image hero-banner__image--desktop'
+        }}
+      {% endif %}
+
+      {% if has_mobile_image %}
+        {{ section.settings.hero_image_mobile | image_url: width: 750 | image_tag:
+          loading: 'lazy',
+          sizes: '100vw',
+          widths: '375, 550, 750, 1080',
+          class: 'hero-banner__image hero-banner__image--mobile'
+        }}
+      {% elsif has_desktop_image %}
+        {{ section.settings.hero_image | image_url: width: 750 | image_tag:
+          loading: 'lazy',
+          sizes: '100vw',
+          widths: '375, 550, 750, 1080',
+          class: 'hero-banner__image hero-banner__image--mobile'
+        }}
+      {% endif %}
+
+      {% if section.settings.overlay_opacity > 0 %}
+        <div class="hero-banner__overlay"></div>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="hero-banner__placeholder">
+      {{ 'lifestyle-1' | placeholder_svg_tag }}
+    </div>
+  {% endif %}
+
+  <div class="hero-banner__content-wrapper hero-banner__content-wrapper--{{ section.settings.content_position }}">
+    <div class="hero-banner__content">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'heading' %}
+            <h1
+              class="hero-banner__heading"
+              style="
+                color: {{ block.settings.heading_color }};
+                font-size: {{ block.settings.heading_size }}px;
+              "
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.heading }}
+            </h1>
+
+          {% when 'subheading' %}
+            <h2
+              class="hero-banner__subheading"
+              style="
+                color: {{ block.settings.subheading_color }};
+                font-size: {{ block.settings.subheading_size }}px;
+              "
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.subheading }}
+            </h2>
+
+          {% when 'paragraph' %}
+            <p
+              class="hero-banner__text"
+              style="
+                color: {{ block.settings.text_color }};
+                font-size: {{ block.settings.text_size }}px;
+              "
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.text }}
+            </p>
+
+          {% when 'button' %}
+            <div class="hero-banner__button-wrapper" {{ block.shopify_attributes }}>
+              <a
+                href="{{ block.settings.button_link }}"
+                class="hero-banner__button hero-banner__button--{{ block.settings.button_style }}"
+                style="
+                  --button-bg-color: {{ block.settings.button_bg_color }};
+                  --button-text-color: {{ block.settings.button_text_color }};
+                  font-size: {{ block.settings.button_text_size }}px;
+                "
+              >
+                {{ block.settings.button_label }}
+              </a>
+            </div>
+        {% endcase %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .hero-banner {
+    position: relative;
+    width: 100%;
+    height: var(--hero-height-mobile);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media screen and (min-width: 750px) {
+    .hero-banner {
+      height: var(--hero-height-desktop);
+    }
+  }
+
+  .hero-banner__image-wrapper,
+  .hero-banner__placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-banner__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .hero-banner__image--desktop {
+    display: none;
+  }
+
+  .hero-banner__image--mobile {
+    display: block;
+  }
+
+  @media screen and (min-width: 750px) {
+    .hero-banner__image--desktop {
+      display: block;
+    }
+
+    .hero-banner__image--mobile {
+      display: none;
+    }
+
+    .hero-banner__image--mobile:only-child {
+      display: block;
+    }
+  }
+
+  .hero-banner__placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-banner__placeholder svg {
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+  }
+
+  .hero-banner__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, calc(var(--overlay-opacity) / 100));
+    pointer-events: none;
+  }
+
+  .hero-banner__content-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  @media screen and (min-width: 750px) {
+    .hero-banner__content-wrapper {
+      padding: 40px;
+    }
+  }
+
+  /* Position variations */
+  .hero-banner__content-wrapper--top-left {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .hero-banner__content-wrapper--top-center {
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .hero-banner__content-wrapper--top-right {
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .hero-banner__content-wrapper--middle-left {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .hero-banner__content-wrapper--middle-center {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-banner__content-wrapper--middle-right {
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .hero-banner__content-wrapper--bottom-left {
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  .hero-banner__content-wrapper--bottom-center {
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .hero-banner__content-wrapper--bottom-right {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .hero-banner__content {
+    background: rgba(255, 255, 255, calc(var(--content-bg-opacity) / 100));
+    padding: var(--content-padding);
+    border-radius: 8px;
+    max-width: var(--content-width);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .hero-banner__content-wrapper--top-center .hero-banner__content,
+  .hero-banner__content-wrapper--middle-center .hero-banner__content,
+  .hero-banner__content-wrapper--bottom-center .hero-banner__content {
+    text-align: center;
+    align-items: center;
+  }
+
+  .hero-banner__content-wrapper--top-right .hero-banner__content,
+  .hero-banner__content-wrapper--middle-right .hero-banner__content,
+  .hero-banner__content-wrapper--bottom-right .hero-banner__content {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .hero-banner__heading {
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .hero-banner__subheading {
+    font-weight: 500;
+    line-height: 1.3;
+    margin: 0;
+  }
+
+  .hero-banner__text {
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .hero-banner__button-wrapper {
+    margin-top: 8px;
+  }
+
+  .hero-banner__button {
+    display: inline-block;
+    padding: 12px 32px;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+
+  .hero-banner__button--primary {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: 2px solid var(--button-bg-color);
+  }
+
+  .hero-banner__button--primary:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+
+  .hero-banner__button--secondary {
+    background-color: transparent;
+    color: var(--button-bg-color);
+    border: 2px solid var(--button-bg-color);
+  }
+
+  .hero-banner__button--secondary:hover {
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Hero banner",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Desktop image"
+    },
+    {
+      "type": "image_picker",
+      "id": "hero_image_mobile",
+      "label": "Mobile image",
+      "info": "Optional. If not set, desktop image will be used."
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Image overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 10,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Content settings"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content position",
+      "options": [
+        { "value": "top-left", "label": "Top left" },
+        { "value": "top-center", "label": "Top center" },
+        { "value": "top-right", "label": "Top right" },
+        { "value": "middle-left", "label": "Middle left" },
+        { "value": "middle-center", "label": "Middle center" },
+        { "value": "middle-right", "label": "Middle right" },
+        { "value": "bottom-left", "label": "Bottom left" },
+        { "value": "bottom-center", "label": "Bottom center" },
+        { "value": "bottom-right", "label": "Bottom right" }
+      ],
+      "default": "middle-left"
+    },
+    {
+      "type": "range",
+      "id": "content_width",
+      "label": "Content block width",
+      "min": 300,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "label": "Content padding",
+      "min": 20,
+      "max": 80,
+      "step": 10,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "content_bg_opacity",
+      "label": "Content background opacity",
+      "min": 0,
+      "max": 100,
+      "step": 10,
+      "unit": "%",
+      "default": 90
+    },
+    {
+      "type": "header",
+      "content": "Section height"
+    },
+    {
+      "type": "range",
+      "id": "height_desktop",
+      "label": "Desktop height",
+      "min": 300,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "height_mobile",
+      "label": "Mobile height",
+      "min": 200,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "default": 400
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Welcome to our store"
+        },
+        {
+          "type": "color",
+          "id": "heading_color",
+          "label": "Heading color",
+          "default": "#000000"
+        },
+        {
+          "type": "range",
+          "id": "heading_size",
+          "label": "Heading font size",
+          "min": 20,
+          "max": 72,
+          "step": 2,
+          "unit": "px",
+          "default": 48
+        }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Subheading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Discover amazing products"
+        },
+        {
+          "type": "color",
+          "id": "subheading_color",
+          "label": "Subheading color",
+          "default": "#333333"
+        },
+        {
+          "type": "range",
+          "id": "subheading_size",
+          "label": "Subheading font size",
+          "min": 14,
+          "max": 48,
+          "step": 2,
+          "unit": "px",
+          "default": 24
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "name": "Paragraph",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Add a brief description about your store or promotion"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color",
+          "default": "#555555"
+        },
+        {
+          "type": "range",
+          "id": "text_size",
+          "label": "Text font size",
+          "min": 12,
+          "max": 32,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            { "value": "primary", "label": "Primary" },
+            { "value": "secondary", "label": "Secondary" }
+          ],
+          "default": "primary"
+        },
+        {
+          "type": "color",
+          "id": "button_bg_color",
+          "label": "Button background color",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "button_text_color",
+          "label": "Button text color",
+          "default": "#ffffff"
+        },
+        {
+          "type": "range",
+          "id": "button_text_size",
+          "label": "Button font size",
+          "min": 12,
+          "max": 24,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero banner",
+      "blocks": [
+        {
+          "type": "heading"
+        },
+        {
+          "type": "subheading"
+        },
+        {
+          "type": "paragraph"
+        },
+        {
+          "type": "button"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
