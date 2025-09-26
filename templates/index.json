@@ -15,24 +15,16 @@
         "heading_taUEq7": {
           "type": "heading",
           "settings": {
-            "heading": "Welcome to our store",
+            "heading": "Redefine What This Can Do",
             "heading_color": "#000000",
             "heading_size": 48
-          }
-        },
-        "subheading_U6ErrM": {
-          "type": "subheading",
-          "settings": {
-            "subheading": "Discover amazing products",
-            "subheading_color": "#333333",
-            "subheading_size": 24
           }
         },
         "paragraph_pEr3J9": {
           "type": "paragraph",
           "settings": {
-            "text": "Add a brief description about your store or promotion",
-            "text_color": "#555555",
+            "text": "Paleo waistcoat vinyl palo santo neutral milk hotel, hell of cloud bread sustainable disrupt.",
+            "text_color": "#000000",
             "text_size": 16
           }
         },
@@ -50,7 +42,6 @@
       },
       "block_order": [
         "heading_taUEq7",
-        "subheading_U6ErrM",
         "paragraph_pEr3J9",
         "button_k9jwtB"
       ],
@@ -60,7 +51,7 @@
         "hero_image_mobile": "shopify://shop_images/bannerMOBILE_2x_723a8798-a9a0-4f13-957c-1bd52794e479.webp",
         "overlay_opacity": 0,
         "content_position": "middle-left",
-        "content_width": 600,
+        "content_width": 540,
         "content_padding": 40,
         "content_bg_opacity": 90,
         "height_desktop": 600,
