@@ -54,8 +54,8 @@
         "content_width": 540,
         "content_padding": 40,
         "content_bg_opacity": 90,
-        "height_desktop": 600,
-        "height_mobile": 400
+        "height_desktop": 700,
+        "height_mobile": 500
       }
     }
   },
