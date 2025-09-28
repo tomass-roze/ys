@@ -38,6 +38,9 @@
     "remove": "Remove",
     "empty": "Your cart is empty",
     "continue_shopping": "Continue shopping",
+    "shop_now": "Shop now",
+    "frequently_bought": "Frequently bought",
+    "add_to_cart": "Add to cart",
     "quantity": "Quantity",
     "total": "Total",
     "subtotal": "Subtotal",
@@ -89,5 +92,19 @@
     "default_subheading": "Discover amazing products",
     "default_text": "Add a brief description about your store or promotion",
     "default_button_label": "Shop now"
+  },
+  "products": {
+    "sold_out": "Sold out",
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out",
+      "variant": "Variant",
+      "quantity": "Quantity"
+    },
+    "gallery": {
+      "previous": "Previous image",
+      "next": "Next image",
+      "thumbnail": "View image {{ index }}"
+    }
   }
 }

@@ -1,0 +1,406 @@
+{% doc %}
+  Renders a product media gallery with featured image and thumbnails.
+
+  Features a main image display with navigation controls and thumbnail
+  gallery below for image selection.
+
+  @param {product} product - The product object containing media/images
+  @param {string} [class] - Optional CSS class for the gallery container
+
+  @example
+  {% render 'product-media-gallery', product: product %}
+  {% render 'product-media-gallery', product: product, class: 'custom-gallery' %}
+{% enddoc %}
+
+{% liquid
+  assign featured_media = product.featured_media | default: product.media.first
+  assign media_count = product.media.size
+%}
+
+<div class="product-media-gallery {{ class }}" data-media-count="{{ media_count }}">
+  <div class="product-media-gallery__main">
+    {% if media_count > 1 %}
+      <button
+        type="button"
+        class="product-media-gallery__nav product-media-gallery__nav--prev"
+        aria-label="{{ 'products.gallery.previous' | t }}"
+        data-direction="prev"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="product-media-gallery__nav product-media-gallery__nav--next"
+        aria-label="{{ 'products.gallery.next' | t }}"
+        data-direction="next"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    {% endif %}
+
+    <div class="product-media-gallery__featured">
+      {% for media in product.media %}
+        <div
+          class="product-media-gallery__item{% if forloop.first %} product-media-gallery__item--active{% endif %}"
+          data-media-index="{{ forloop.index0 }}"
+          data-media-id="{{ media.id }}"
+        >
+          {% case media.media_type %}
+            {% when 'image' %}
+              {{ media | image_url: width: 1200 | image_tag:
+                class: 'product-media-gallery__image',
+                loading: 'lazy',
+                sizes: '(min-width: 1024px) 50vw, 100vw',
+                widths: '400,600,800,1000,1200,1400,1600'
+              }}
+            {% when 'video' %}
+              {{ media | video_tag:
+                class: 'product-media-gallery__video',
+                controls: true,
+                muted: true,
+                loop: true
+              }}
+            {% when 'external_video' %}
+              {{ media | external_video_tag:
+                class: 'product-media-gallery__external-video'
+              }}
+            {% when 'model' %}
+              {{ media | model_viewer_tag }}
+          {% endcase %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if media_count > 1 %}
+    <div class="product-media-gallery__thumbnails" role="tablist">
+      {% for media in product.media %}
+        <button
+          type="button"
+          class="product-media-gallery__thumbnail{% if forloop.first %} product-media-gallery__thumbnail--active{% endif %}"
+          data-thumbnail-index="{{ forloop.index0 }}"
+          aria-label="{{ 'products.gallery.thumbnail' | t: index: forloop.index }}"
+          aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+          role="tab"
+        >
+          {% if media.media_type == 'image' %}
+            {{ media | image_url: width: 300, height: 300, crop: 'center' | image_tag:
+              class: 'product-media-gallery__thumbnail-image',
+              loading: 'lazy'
+            }}
+          {% else %}
+            <div class="product-media-gallery__thumbnail-placeholder">
+              {% case media.media_type %}
+                {% when 'video' %}
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 3L19 12L5 21V3Z" fill="currentColor"/>
+                  </svg>
+                {% when 'external_video' %}
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 3L19 12L5 21V3Z" fill="currentColor"/>
+                  </svg>
+                {% when 'model' %}
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2"/>
+                  </svg>
+              {% endcase %}
+            </div>
+          {% endif %}
+        </button>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .product-media-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .product-media-gallery__main {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--style-border-radius, 8px);
+  }
+
+  .product-media-gallery__featured {
+    position: relative;
+    display: flex;
+    transition: transform 0.3s ease;
+    width: 100%;
+  }
+
+  .product-media-gallery__item {
+    flex: 0 0 100%;
+    width: 100%;
+    display: none;
+  }
+
+  .product-media-gallery__item--active {
+    display: block;
+  }
+
+  .product-media-gallery__image,
+  .product-media-gallery__video,
+  .product-media-gallery__external-video {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 1;
+  }
+
+  /* Navigation buttons */
+  .product-media-gallery__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-media-gallery__nav:hover {
+    background-color: rgba(255, 255, 255, 1);
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-media-gallery__nav:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+
+  .product-media-gallery__nav--prev {
+    left: 1rem;
+  }
+
+  .product-media-gallery__nav--next {
+    right: 1rem;
+  }
+
+  /* Thumbnails */
+  .product-media-gallery__thumbnails {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0;
+  }
+
+  .product-media-gallery__thumbnail {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid transparent;
+    border-radius: var(--style-border-radius, 4px);
+    overflow: hidden;
+    cursor: pointer;
+    background-color: var(--color-background-subtle, #f5f5f5);
+    padding: 0;
+    transition: border-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+    opacity: 0.6;
+  }
+
+  .product-media-gallery__thumbnail:hover {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  .product-media-gallery__thumbnail--active {
+    border-color: var(--color-foreground, #333);
+    opacity: 1;
+  }
+
+  .product-media-gallery__thumbnail:focus-visible {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+
+  .product-media-gallery__thumbnail-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-media-gallery__thumbnail-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-foreground, #333);
+    opacity: 0.5;
+  }
+
+  /* Mobile adjustments */
+  @media screen and (max-width: 749px) {
+    .product-media-gallery__nav {
+      width: 40px;
+      height: 40px;
+    }
+
+    .product-media-gallery__nav svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .product-media-gallery__thumbnails {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .product-media-gallery__thumbnails {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class ProductMediaGallery {
+    constructor(element) {
+      this.gallery = element;
+      this.currentIndex = 0;
+      this.items = this.gallery.querySelectorAll('.product-media-gallery__item');
+      this.thumbnails = this.gallery.querySelectorAll('.product-media-gallery__thumbnail');
+      this.mediaCount = parseInt(this.gallery.dataset.mediaCount) || 1;
+
+      if (this.mediaCount <= 1) return;
+
+      this.initializeEventListeners();
+    }
+
+    initializeEventListeners() {
+      // Navigation buttons
+      const navButtons = this.gallery.querySelectorAll('.product-media-gallery__nav');
+      navButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          const direction = e.currentTarget.dataset.direction;
+          this.navigate(direction);
+        });
+      });
+
+      // Thumbnail clicks
+      this.thumbnails.forEach((thumbnail, index) => {
+        thumbnail.addEventListener('click', () => {
+          this.showMedia(index);
+        });
+      });
+
+      // Keyboard navigation
+      this.gallery.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+          this.navigate('prev');
+        } else if (e.key === 'ArrowRight') {
+          this.navigate('next');
+        }
+      });
+
+      // Touch gestures for mobile
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      this.gallery.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      this.gallery.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        this.handleSwipe();
+      }, { passive: true });
+
+      this.handleSwipe = () => {
+        const swipeThreshold = 50;
+        const diff = touchStartX - touchEndX;
+
+        if (Math.abs(diff) > swipeThreshold) {
+          if (diff > 0) {
+            this.navigate('next');
+          } else {
+            this.navigate('prev');
+          }
+        }
+      };
+    }
+
+    navigate(direction) {
+      if (direction === 'prev') {
+        this.currentIndex = this.currentIndex === 0 ? this.mediaCount - 1 : this.currentIndex - 1;
+      } else {
+        this.currentIndex = this.currentIndex === this.mediaCount - 1 ? 0 : this.currentIndex + 1;
+      }
+      this.showMedia(this.currentIndex);
+    }
+
+    showMedia(index) {
+      // Update active media
+      this.items.forEach((item, i) => {
+        if (i === index) {
+          item.classList.add('product-media-gallery__item--active');
+        } else {
+          item.classList.remove('product-media-gallery__item--active');
+        }
+      });
+
+      // Update active thumbnail
+      this.thumbnails.forEach((thumb, i) => {
+        if (i === index) {
+          thumb.classList.add('product-media-gallery__thumbnail--active');
+          thumb.setAttribute('aria-selected', 'true');
+          // Scroll thumbnail into view if needed
+          thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } else {
+          thumb.classList.remove('product-media-gallery__thumbnail--active');
+          thumb.setAttribute('aria-selected', 'false');
+        }
+      });
+
+      this.currentIndex = index;
+
+      // Pause any playing videos when switching
+      const previousVideo = this.items[this.currentIndex === 0 ? this.mediaCount - 1 : this.currentIndex - 1]?.querySelector('video');
+      if (previousVideo) {
+        previousVideo.pause();
+      }
+    }
+  }
+
+  // Initialize all galleries on the page
+  document.addEventListener('DOMContentLoaded', () => {
+    const galleries = document.querySelectorAll('.product-media-gallery');
+    galleries.forEach(gallery => {
+      new ProductMediaGallery(gallery);
+    });
+  });
+
+  // Reinitialize when sections are reloaded (theme editor)
+  if (Shopify && Shopify.designMode) {
+    document.addEventListener('shopify:section:load', (event) => {
+      const gallery = event.target.querySelector('.product-media-gallery');
+      if (gallery) {
+        new ProductMediaGallery(gallery);
+      }
+    });
+  }
+{% endjavascript %}

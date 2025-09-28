@@ -391,13 +391,7 @@
       })
       .then(response => response.json())
       .then(cart => {
-        // Remove the item from DOM
-        const item = document.querySelector(`[data-cart-item-key="${key}"]`);
-        if (item) {
-          item.closest('.cart-drawer__item, .cart-item').remove();
-        }
-
-        // Update cart drawer if it exists
+        // Update cart drawer if it exists - this will handle DOM updates
         if (window.cartDrawer) {
           window.cartDrawer.updateCart(cart);
         }

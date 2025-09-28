@@ -13,7 +13,10 @@
 
   <aside class="cart-drawer__container">
     <header class="cart-drawer__header">
-      <h2 class="cart-drawer__title">{{ 'cart.your_cart' | t }}</h2>
+      <h2 class="cart-drawer__title">
+        {{ 'cart.your_cart' | t }}
+        <span class="cart-drawer__count" data-cart-drawer-count>{{ cart.item_count }}</span>
+      </h2>
       <button type="button" class="cart-drawer__close" data-cart-drawer-close aria-label="{{ 'cart.close' | t }}">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M18 6L6 18M6 6l12 12"/>
@@ -74,8 +77,11 @@
         <div class="cart-drawer__empty">
           <p>{{ 'cart.empty' | t }}</p>
           <a href="{{ routes.all_products_collection_url }}" class="cart-drawer__continue-shopping">
-            {{ 'cart.continue_shopping' | t }}
+            {{ 'cart.shop_now' | t }}
           </a>
+
+          {% comment %} Show product recommendations for empty cart {% endcomment %}
+          {% render 'cart-empty-recommendations', collection: settings.cart_recommendations_collection, limit: 3 %}
         </div>
       {% endif %}
     </div>
@@ -159,6 +165,23 @@
   .cart-drawer__title {
     margin: 0;
     font-size: 1.25rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .cart-drawer__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding: 0 0.375rem;
+    background: #FFD563;
+    color: var(--color-foreground, #000);
+    border-radius: 12px;
+    font-size: 0.875rem;
     font-weight: 600;
   }
 
@@ -254,16 +277,20 @@
 
   .cart-drawer__continue-shopping {
     display: inline-block;
-    padding: 0.75rem 2rem;
-    background: var(--color-primary, #000);
-    color: var(--color-background);
+    padding: 12px 32px;
+    background-color: #000000;
+    color: #ffffff;
+    border: 2px solid #000000;
     border-radius: 4px;
     text-decoration: none;
-    transition: opacity 0.2s;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
   }
 
   .cart-drawer__continue-shopping:hover {
-    opacity: 0.8;
+    opacity: 0.9;
+    transform: translateY(-2px);
   }
 
   .cart-drawer__recommendations {
@@ -369,16 +396,47 @@
           const newDocument = parser.parseFromString(html, 'text/html');
           const newContent = newDocument.querySelector('.cart-drawer__content');
           const newFooter = newDocument.querySelector('.cart-drawer__footer');
+          const newCount = newDocument.querySelector('[data-cart-drawer-count]');
+          const newFreeShipping = newDocument.querySelector('.cart-drawer__free-shipping');
 
           if (newContent) {
             const currentContent = this.drawer.querySelector('.cart-drawer__content');
             currentContent.innerHTML = newContent.innerHTML;
           }
 
+          // Update free shipping progress
+          if (newFreeShipping) {
+            const currentFreeShipping = this.drawer.querySelector('.cart-drawer__free-shipping');
+            if (currentFreeShipping) {
+              currentFreeShipping.innerHTML = newFreeShipping.innerHTML;
+            }
+          }
+
+          // Update or remove footer based on cart state
+          const currentFooter = this.drawer.querySelector('.cart-drawer__footer');
           if (newFooter) {
-            const currentFooter = this.drawer.querySelector('.cart-drawer__footer');
             if (currentFooter) {
               currentFooter.innerHTML = newFooter.innerHTML;
+            } else {
+              // Footer should exist but doesn't, create it
+              const container = this.drawer.querySelector('.cart-drawer__container');
+              const footerElement = document.createElement('footer');
+              footerElement.className = 'cart-drawer__footer';
+              footerElement.innerHTML = newFooter.innerHTML;
+              container.appendChild(footerElement);
+            }
+          } else {
+            // No footer in new HTML (cart is empty), remove existing footer
+            if (currentFooter) {
+              currentFooter.remove();
+            }
+          }
+
+          // Update cart count in drawer header
+          if (newCount) {
+            const currentCount = this.drawer.querySelector('[data-cart-drawer-count]');
+            if (currentCount) {
+              currentCount.textContent = newCount.textContent;
             }
           }
         });
@@ -394,6 +452,66 @@
   document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.cartDrawer === 'undefined') {
       window.cartDrawer = new CartDrawer();
+    }
+  });
+
+  // Handle empty cart recommendations add to cart
+  document.addEventListener('submit', async (e) => {
+    if (e.target.matches('[data-empty-cart-add-form]')) {
+      e.preventDefault();
+
+      const form = e.target;
+      const button = form.querySelector('.cart-empty-recommendations__add-button');
+      const originalButtonText = button.textContent;
+
+      button.disabled = true;
+      button.textContent = 'Adding...';
+
+      try {
+        const formData = new FormData(form);
+        const response = await fetch('/cart/add.js', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          const item = await response.json();
+
+          // Get updated cart to refresh the drawer
+          const cartResponse = await fetch('/cart.js');
+          const cart = await cartResponse.json();
+
+          if (window.cartDrawer) {
+            window.cartDrawer.updateCart(cart);
+          }
+
+          // Update cart count in header
+          const cartCounts = document.querySelectorAll('[data-cart-count]');
+          cartCounts.forEach(el => {
+            el.textContent = cart.item_count;
+            if (cart.item_count === 0) {
+              el.style.display = 'none';
+            } else {
+              el.style.display = '';
+            }
+          });
+
+          button.textContent = 'Added!';
+          button.style.opacity = '0.7';
+
+          setTimeout(() => {
+            button.textContent = originalButtonText;
+            button.disabled = false;
+            button.style.opacity = '';
+          }, 2000);
+        } else {
+          throw new Error('Failed to add item');
+        }
+      } catch (error) {
+        console.error('Error adding item to cart:', error);
+        button.textContent = originalButtonText;
+        button.disabled = false;
+      }
     }
   });
 {% endjavascript %}
