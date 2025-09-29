@@ -1,0 +1,71 @@
+{% doc %}
+  Renders the product title with customizable heading level and styling.
+
+  @param {block} block - The block object containing settings
+  @param {product} product - The product object
+
+  @example
+  {% render 'product-title', block: block, product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign heading_tag = block.settings.heading_level | default: 'h1'
+-%}
+
+<div
+  class="product-block-wrapper"
+  style="
+    --padding-top: {{ block.settings.padding_top | default: 0 }}px;
+    --padding-bottom: {{ block.settings.padding_bottom | default: 0 }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  <{{ heading_tag }}
+    class="product-title {{ block.settings.title_size }}"
+    style="--text-align: {{ block.settings.alignment }}"
+  >
+    {{ product.title }}
+  </{{ heading_tag }}>
+</div>
+
+{% stylesheet %}
+  .product-block-wrapper {
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .product-title {
+    margin: 0;
+    line-height: 1.2;
+    text-align: var(--text-align);
+  }
+
+  .product-title--small {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .product-title--medium {
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  .product-title--large {
+    font-size: 2.5rem;
+    font-weight: 600;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-title--small {
+      font-size: 1.25rem;
+    }
+
+    .product-title--medium {
+      font-size: 1.75rem;
+    }
+
+    .product-title--large {
+      font-size: 2rem;
+    }
+  }
+{% endstylesheet %}

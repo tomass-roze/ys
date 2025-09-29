@@ -5,7 +5,7 @@
     --overlay-opacity: {{ section.settings.overlay_opacity }}%;
     --content-padding: {{ section.settings.content_padding }}px;
     --content-bg-opacity: {{ section.settings.content_bg_opacity }}%;
-    --content-width: {{ section.settings.content_width }}px;
+    --hero-content-width: {{ section.settings.content_width }}px;
   "
 >
   {% assign has_mobile_image = section.settings.hero_image_mobile %}
@@ -253,7 +253,7 @@
     background: rgba(255, 255, 255, calc(var(--content-bg-opacity) / 100));
     padding: var(--content-padding);
     border-radius: 8px;
-    max-width: var(--content-width);
+    max-width: var(--hero-content-width);
     width: 100%;
     display: flex;
     flex-direction: column;

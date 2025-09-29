@@ -1,0 +1,79 @@
+{% doc %}
+  Renders the product description with optional truncation.
+
+  @param {block} block - The block object containing settings
+  @param {product} product - The product object
+
+  @example
+  {% render 'product-description', block: block, product: product %}
+{% enddoc %}
+
+{%- if product.description != blank -%}
+  <div
+    class="product-block-wrapper"
+    style="
+      --padding-top: {{ block.settings.padding_top | default: 0 }}px;
+      --padding-bottom: {{ block.settings.padding_bottom | default: 0 }}px;
+    "
+    {{ block.shopify_attributes }}
+  >
+    <div
+      class="product-description"
+      style="--text-align: {{ block.settings.alignment }}"
+    >
+      {%- if block.settings.truncate and block.settings.truncate_length > 0 -%}
+        {{ product.description | truncatewords: block.settings.truncate_length }}
+      {%- else -%}
+        {{ product.description }}
+      {%- endif -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .product-block-wrapper {
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .product-description {
+    line-height: 1.6;
+    color: var(--color-foreground-subtle, #666);
+    text-align: var(--text-align);
+  }
+
+  .product-description > * {
+    margin-bottom: 1rem;
+  }
+
+  .product-description > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-description p {
+    margin: 0 0 1rem 0;
+  }
+
+  .product-description p:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-description ul,
+  .product-description ol {
+    margin: 0 0 1rem 1.5rem;
+    padding: 0;
+  }
+
+  .product-description li {
+    margin-bottom: 0.5rem;
+  }
+
+  .product-description a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .product-description a:hover {
+    opacity: 0.7;
+  }
+{% endstylesheet %}

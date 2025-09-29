@@ -105,6 +105,102 @@
       "previous": "Previous image",
       "next": "Next image",
       "thumbnail": "View image {{ index }}"
+    },
+    "blocks": {
+      "title": {
+        "name": "Product title",
+        "heading_level": "Heading level"
+      },
+      "vendor": {
+        "name": "Product vendor",
+        "show_vendor": "Show vendor"
+      },
+      "price": {
+        "name": "Product price",
+        "show_compare": "Show compare at price",
+        "show_savings": "Show savings amount",
+        "save": "Save {{ amount }}"
+      },
+      "description": {
+        "name": "Product description",
+        "truncate": "Truncate description",
+        "truncate_length": "Truncation length"
+      },
+      "form": {
+        "name": "Product form",
+        "show_quantity": "Show quantity selector",
+        "show_dynamic_checkout": "Show dynamic checkout button",
+        "button_text": "Button text",
+        "button_text_info": "Leave blank to use default text"
+      },
+      "variants": {
+        "name": "Variant selector",
+        "show_price": "Show price in variant options"
+      },
+      "quantity": {
+        "name": "Quantity selector",
+        "show_buttons": "Show plus/minus buttons",
+        "show_buttons_info": "Display buttons to increase or decrease quantity",
+        "min_quantity": "Minimum quantity",
+        "max_quantity": "Maximum quantity",
+        "max_quantity_info": "Set to 0 for no maximum limit",
+        "increase": "Increase quantity",
+        "decrease": "Decrease quantity"
+      },
+      "features": {
+        "name": "Product features",
+        "custom_content": "Custom content",
+        "custom_content_info": "If empty, will display product.metafields.custom.features"
+      },
+      "buy_buttons": {
+        "name": "Buy buttons",
+        "button_text": "Button text",
+        "button_text_info": "Leave blank to use default text",
+        "button_style": "Button style",
+        "show_dynamic_checkout": "Show dynamic checkout button",
+        "show_dynamic_checkout_info": "Displays express payment buttons like Apple Pay, Google Pay, etc."
+      }
+    }
+  },
+  "labels": {
+    "label": "Label",
+    "size": "Size",
+    "layout": "Layout",
+    "style": "Style",
+    "alignment": "Alignment",
+    "text_style": "Text style"
+  },
+  "options": {
+    "size": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large"
+    },
+    "layout": {
+      "inline": "Inline",
+      "stacked": "Stacked"
+    },
+    "style": {
+      "subtle_background": "Subtle background",
+      "bordered": "Bordered",
+      "none": "None"
+    },
+    "alignment": {
+      "left": "Left",
+      "center": "Center",
+      "right": "Right"
+    },
+    "text_style": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "normal": "Normal",
+      "uppercase": "Uppercase",
+      "bold": "Bold"
+    },
+    "button_style": {
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "accent": "Accent"
     }
   }
 }

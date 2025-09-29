@@ -1,0 +1,107 @@
+{% doc %}
+  Renders a list of product benefits with checkmark icons.
+
+  @param {block} block - The block object containing settings
+  @param {product} product - The product object
+
+  @example
+  {% render 'product-benefits', block: block, product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign benefits = block.settings.benefits | split: '|'
+-%}
+
+{%- if benefits.size > 0 -%}
+  <div
+    class="product-block-wrapper"
+    style="
+      --padding-top: {{ block.settings.padding_top | default: 0 }}px;
+      --padding-bottom: {{ block.settings.padding_bottom | default: 0 }}px;
+    "
+    {{ block.shopify_attributes }}
+  >
+    <div class="product-benefits {{ block.settings.style }}">
+      {%- if block.settings.title != blank -%}
+        <h3 class="product-benefits__title">
+          {{ block.settings.title }}
+        </h3>
+      {%- endif -%}
+
+      <ul class="product-benefits__list">
+        {%- for benefit in benefits -%}
+          {%- assign trimmed_benefit = benefit | strip -%}
+          {%- if trimmed_benefit != blank -%}
+            <li class="product-benefits__item">
+              <svg class="product-benefits__icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="10" fill="currentColor" opacity="0.1"/>
+                <path d="M14 7L8.5 12.5L6 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span class="product-benefits__text">{{ trimmed_benefit }}</span>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .product-block-wrapper {
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .product-benefits {
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+
+  .product-benefits--subtle {
+    background-color: var(--color-background-subtle, #f9f9f9);
+  }
+
+  .product-benefits--bordered {
+    border: 1px solid var(--color-border, #e5e5e5);
+  }
+
+  .product-benefits--none {
+    padding: 0;
+  }
+
+  .product-benefits__title {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 1rem 0;
+  }
+
+  .product-benefits__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .product-benefits__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .product-benefits__icon {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+    color: var(--color-foreground, #333);
+  }
+
+  .product-benefits__text {
+    flex: 1;
+    color: var(--color-foreground, #333);
+    font-size: 0.9375rem;
+  }
+{% endstylesheet %}

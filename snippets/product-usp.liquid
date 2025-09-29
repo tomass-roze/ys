@@ -1,0 +1,76 @@
+{% doc %}
+  Renders product unique selling points as pill-shaped badges.
+
+  @param {block} block - The block object containing settings
+  @param {product} product - The product object
+
+  @example
+  {% render 'product-usp', block: block, product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign selling_points = block.settings.selling_points | split: '|'
+-%}
+
+{%- if selling_points.size > 0 -%}
+  <div
+    class="product-block-wrapper"
+    style="
+      --padding-top: {{ block.settings.padding_top | default: 0 }}px;
+      --padding-bottom: {{ block.settings.padding_bottom | default: 0 }}px;
+    "
+    {{ block.shopify_attributes }}
+  >
+    <div class="product-usp">
+      <ul class="product-usp__list">
+        {%- for point in selling_points -%}
+          {%- assign trimmed_point = point | strip -%}
+          {%- if trimmed_point != blank -%}
+            <li class="product-usp__item">
+              {{ trimmed_point }}
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .product-block-wrapper {
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .product-usp {
+    width: 100%;
+  }
+
+  .product-usp__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .product-usp__item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #e5e5e5;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  .product-usp__item:hover {
+    border-color: #333333;
+    transform: translateY(-1px);
+  }
+{% endstylesheet %}

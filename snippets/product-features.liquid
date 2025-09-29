@@ -1,0 +1,114 @@
+{% doc %}
+  Renders product features from a metafield or custom content.
+
+  @param {block} block - The block object containing settings
+  @param {product} product - The product object
+
+  @example
+  {% render 'product-features', block: block, product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign has_metafield = false
+  if product.metafields.custom.features != blank
+    assign has_metafield = true
+  endif
+
+  assign has_custom_content = false
+  if block.settings.custom_content != blank
+    assign has_custom_content = true
+  endif
+-%}
+
+{%- if has_metafield or has_custom_content -%}
+  <div
+    class="product-block-wrapper"
+    style="
+      --padding-top: {{ block.settings.padding_top | default: 0 }}px;
+      --padding-bottom: {{ block.settings.padding_bottom | default: 0 }}px;
+    "
+    {{ block.shopify_attributes }}
+  >
+    <div class="product-features {{ block.settings.style }}">
+      {%- if block.settings.title != blank -%}
+        <h3 class="product-features__title">
+          {{ block.settings.title }}
+        </h3>
+      {%- endif -%}
+
+      <div class="product-features__content">
+        {%- if has_custom_content -%}
+          {{ block.settings.custom_content }}
+        {%- elsif has_metafield -%}
+          {{ product.metafields.custom.features }}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .product-block-wrapper {
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+  }
+
+  .product-features {
+    padding: 1.5rem;
+    border-radius: var(--style-border-radius, 8px);
+  }
+
+  .product-features--subtle {
+    background-color: var(--color-background-subtle, #f9f9f9);
+  }
+
+  .product-features--bordered {
+    border: 1px solid var(--color-border, #e5e5e5);
+  }
+
+  .product-features--none {
+    padding: 0;
+  }
+
+  .product-features__title {
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 1rem 0;
+  }
+
+  .product-features__content {
+    line-height: 1.6;
+  }
+
+  .product-features__content > * {
+    margin-bottom: 0.75rem;
+  }
+
+  .product-features__content > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-features__content ul,
+  .product-features__content ol {
+    margin: 0 0 0.75rem 1.25rem;
+    padding: 0;
+  }
+
+  .product-features__content li {
+    margin-bottom: 0.5rem;
+  }
+
+  .product-features__content li:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-features__content p {
+    margin: 0 0 0.75rem 0;
+  }
+
+  .product-features__content p:last-child {
+    margin-bottom: 0;
+  }
+{% endstylesheet %}

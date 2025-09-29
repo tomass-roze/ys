@@ -5,115 +5,49 @@
   https://shopify.dev/docs/storefronts/themes/architecture/templates/product
 {% endcomment %}
 
-<div class="product-main">
+<div
+  class="product-main"
+  style="
+    --block-spacing: {{ section.settings.block_spacing }}px;
+    --gallery-width: {{ section.settings.gallery_width }}%;
+    --content-max-width: {{ section.settings.content_max_width }}px;
+  "
+>
   <div class="product-main__media">
     {% render 'product-media-gallery', product: product %}
   </div>
 
   <div class="product-main__content">
-    <div class="product-main__header">
-      <h1 class="product-main__title">{{ product.title }}</h1>
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'product-title' -%}
+          {% render 'product-title', block: block, product: product %}
 
-      {% if product.vendor %}
-        <p class="product-main__vendor">{{ product.vendor }}</p>
-      {% endif %}
+        {%- when 'product-vendor' -%}
+          {% render 'product-vendor', block: block, product: product %}
 
-      <div class="product-main__price">
-        {% if product.compare_at_price_max > product.price %}
-          <span class="product-main__price--compare">
-            <s>{{ product.compare_at_price_max | money }}</s>
-          </span>
-        {% endif %}
-        <span class="product-main__price--current">
-          {{ product.price | money }}
-        </span>
-      </div>
-    </div>
+        {%- when 'product-price' -%}
+          {% render 'product-price', block: block, product: product %}
 
-    {% if product.description != blank %}
-      <div class="product-main__description">
-        {{ product.description }}
-      </div>
-    {% endif %}
+        {%- when 'product-description' -%}
+          {% render 'product-description', block: block, product: product %}
 
-    <div class="product-main__form">
-      {% form 'product', product, class: 'product-form' %}
-        {% assign current_variant = product.selected_or_first_available_variant %}
+        {%- when 'product-form' -%}
+          {% render 'product-form', block: block, product: product %}
 
-        {% if product.has_only_default_variant == false %}
-          <div class="product-form__variants">
-            <label for="variant-select" class="product-form__label">
-              {{ 'products.product.variant' | t }}
-            </label>
-            <select
-              id="variant-select"
-              name="id"
-              class="product-form__select"
-            >
-              {% for variant in product.variants %}
-                <option
-                  value="{{ variant.id }}"
-                  {% if variant == current_variant %}
-                    selected="selected"
-                  {% endif %}
-                  {% unless variant.available %}
-                    disabled="disabled"
-                  {% endunless %}
-                >
-                  {{ variant.title }}
-                  {% if variant.available %}
-                    - {{ variant.price | money }}
-                  {% else %}
-                    - {{ 'products.product.sold_out' | t }}
-                  {% endif %}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-        {% else %}
-          <input type="hidden" name="id" value="{{ current_variant.id }}">
-        {% endif %}
+        {%- when 'product-features' -%}
+          {% render 'product-features', block: block, product: product %}
 
-        <div class="product-form__quantity">
-          <label for="quantity" class="product-form__label">
-            {{ 'products.product.quantity' | t }}
-          </label>
-          <input
-            type="number"
-            id="quantity"
-            name="quantity"
-            min="1"
-            value="1"
-            class="product-form__input"
-          >
-        </div>
+        {%- when 'product-benefits' -%}
+          {% render 'product-benefits', block: block, product: product %}
 
-        <div class="product-form__buttons">
-          <button
-            type="submit"
-            name="add"
-            class="product-form__submit"
-            {% unless current_variant.available %}
-              disabled="disabled"
-            {% endunless %}
-          >
-            {% if current_variant.available %}
-              {{ 'products.product.add_to_cart' | t }}
-            {% else %}
-              {{ 'products.product.sold_out' | t }}
-            {% endif %}
-          </button>
+        {%- when 'product-usp' -%}
+          {% render 'product-usp', block: block, product: product %}
 
-          {{ form | payment_button }}
-        </div>
-      {% endform %}
-    </div>
-
-    {% if product.metafields.custom.features %}
-      <div class="product-main__features">
-        {{ product.metafields.custom.features }}
-      </div>
-    {% endif %}
+        {%- when '@app' -%}
+          {% render block %}
+      {%- endcase -%}
+    {%- endfor -%}
   </div>
 </div>
 
@@ -128,7 +62,7 @@
   /* Desktop layout - two columns */
   @media screen and (min-width: 750px) {
     .product-main {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: var(--gallery-width, 50%) 1fr;
       gap: 3rem;
       align-items: start;
     }
@@ -151,162 +85,9 @@
   .product-main__content {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-  }
-
-  /* Product header */
-  .product-main__header {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--color-border, #e5e5e5);
-  }
-
-  .product-main__title {
-    font-size: 2rem;
-    font-weight: 600;
-    line-height: 1.2;
-    margin: 0;
-  }
-
-  .product-main__vendor {
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    opacity: 0.7;
-    margin: 0;
-  }
-
-  .product-main__price {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-  }
-
-  .product-main__price--current {
-    font-size: 1.5rem;
-    font-weight: 500;
-  }
-
-  .product-main__price--compare {
-    font-size: 1.25rem;
-    opacity: 0.6;
-  }
-
-  /* Product description */
-  .product-main__description {
-    line-height: 1.6;
-    color: var(--color-foreground-subtle, #666);
-  }
-
-  .product-main__description > * {
-    margin-bottom: 1rem;
-  }
-
-  .product-main__description > *:last-child {
-    margin-bottom: 0;
-  }
-
-  /* Product form */
-  .product-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .product-form__variants,
-  .product-form__quantity {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .product-form__label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .product-form__select,
-  .product-form__input {
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--color-border, #e5e5e5);
-    border-radius: var(--style-border-radius-inputs, 4px);
-    background-color: var(--color-background);
-    font-size: 1rem;
-    width: 100%;
-    transition: border-color 0.2s ease;
-  }
-
-  .product-form__select:hover,
-  .product-form__input:hover {
-    border-color: var(--color-foreground, #333);
-  }
-
-  .product-form__select:focus,
-  .product-form__input:focus {
-    outline: none;
-    border-color: var(--color-foreground, #333);
-    box-shadow: 0 0 0 1px var(--color-foreground, #333);
-  }
-
-  .product-form__buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .product-form__submit {
-    padding: 1rem 2rem;
-    background-color: var(--color-foreground, #333);
-    color: var(--color-background, #fff);
-    border: none;
-    border-radius: var(--style-border-radius-inputs, 4px);
-    font-size: 1rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-  }
-
-  .product-form__submit:hover:not(:disabled) {
-    opacity: 0.9;
-    transform: translateY(-1px);
-  }
-
-  .product-form__submit:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  .product-form__submit:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .product-form__submit:focus-visible {
-    outline: 2px solid var(--color-foreground);
-    outline-offset: 2px;
-  }
-
-  /* Shopify payment button */
-  .shopify-payment-button {
-    margin-top: 0;
-  }
-
-  .shopify-payment-button__button {
-    width: 100%;
-    min-height: 3rem;
-  }
-
-  /* Product features */
-  .product-main__features {
-    padding: 1.5rem;
-    background-color: var(--color-background-subtle, #f9f9f9);
-    border-radius: var(--style-border-radius, 8px);
+    gap: var(--block-spacing, 2rem);
+    max-width: var(--content-max-width, 100%);
+    margin-left: auto;
   }
 
   /* Mobile adjustments */
@@ -316,12 +97,9 @@
       top: 0;
     }
 
-    .product-main__title {
-      font-size: 1.75rem;
-    }
-
-    .product-main__price--current {
-      font-size: 1.25rem;
+    .product-main__content {
+      max-width: 100%;
+      margin-left: 0;
     }
   }
 {% endstylesheet %}
@@ -329,7 +107,456 @@
 {% schema %}
 {
   "name": "t:general.product",
-  "settings": [],
+  "blocks": [
+    {
+      "type": "product-title",
+      "name": "t:products.blocks.title.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "heading_level",
+          "label": "t:products.blocks.title.heading_level",
+          "options": [
+            { "value": "h1", "label": "H1" },
+            { "value": "h2", "label": "H2" },
+            { "value": "h3", "label": "H3" }
+          ],
+          "default": "h1"
+        },
+        {
+          "type": "select",
+          "id": "title_size",
+          "label": "t:labels.size",
+          "options": [
+            { "value": "product-title--small", "label": "t:options.size.small" },
+            { "value": "product-title--medium", "label": "t:options.size.medium" },
+            { "value": "product-title--large", "label": "t:options.size.large" }
+          ],
+          "default": "product-title--medium"
+        },
+        {
+          "type": "text_alignment",
+          "id": "alignment",
+          "label": "t:labels.alignment",
+          "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "product-vendor",
+      "name": "t:products.blocks.vendor.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_vendor",
+          "label": "t:products.blocks.vendor.show_vendor",
+          "default": true
+        },
+        {
+          "type": "select",
+          "id": "text_style",
+          "label": "t:labels.text_style",
+          "options": [
+            { "value": "product-vendor--uppercase", "label": "t:options.text_style.uppercase" },
+            { "value": "product-vendor--normal", "label": "t:options.text_style.normal" },
+            { "value": "product-vendor--bold", "label": "t:options.text_style.bold" }
+          ],
+          "default": "product-vendor--uppercase"
+        },
+        {
+          "type": "text_alignment",
+          "id": "alignment",
+          "label": "t:labels.alignment",
+          "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "product-price",
+      "name": "t:products.blocks.price.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_compare",
+          "label": "t:products.blocks.price.show_compare",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_savings",
+          "label": "t:products.blocks.price.show_savings",
+          "default": false
+        },
+        {
+          "type": "select",
+          "id": "layout",
+          "label": "t:labels.layout",
+          "options": [
+            { "value": "product-price--inline", "label": "t:options.layout.inline" },
+            { "value": "product-price--stacked", "label": "t:options.layout.stacked" }
+          ],
+          "default": "product-price--inline"
+        },
+        {
+          "type": "text_alignment",
+          "id": "alignment",
+          "label": "t:labels.alignment",
+          "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "product-description",
+      "name": "t:products.blocks.description.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "truncate",
+          "label": "t:products.blocks.description.truncate",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "truncate_length",
+          "label": "t:products.blocks.description.truncate_length",
+          "min": 10,
+          "max": 200,
+          "step": 10,
+          "unit": "w",
+          "default": 50
+        },
+        {
+          "type": "text_alignment",
+          "id": "alignment",
+          "label": "t:labels.alignment",
+          "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "product-form",
+      "name": "t:products.blocks.form.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_quantity",
+          "label": "t:products.blocks.form.show_quantity",
+          "default": true
+        },
+        {
+          "type": "checkbox",
+          "id": "show_dynamic_checkout",
+          "label": "t:products.blocks.form.show_dynamic_checkout",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "t:products.blocks.form.button_text",
+          "info": "t:products.blocks.form.button_text_info"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "product-features",
+      "name": "t:products.blocks.features.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:labels.title",
+          "default": "Features"
+        },
+        {
+          "type": "richtext",
+          "id": "custom_content",
+          "label": "t:products.blocks.features.custom_content",
+          "info": "t:products.blocks.features.custom_content_info"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "t:labels.style",
+          "options": [
+            { "value": "product-features--subtle", "label": "t:options.style.subtle_background" },
+            { "value": "product-features--bordered", "label": "t:options.style.bordered" },
+            { "value": "product-features--none", "label": "t:options.style.none" }
+          ],
+          "default": "product-features--subtle"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "product-benefits",
+      "name": "t:products.blocks.benefits.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "t:labels.title",
+          "default": "Benefits"
+        },
+        {
+          "type": "textarea",
+          "id": "benefits",
+          "label": "t:products.blocks.benefits.benefits_list",
+          "info": "t:products.blocks.benefits.benefits_list_info",
+          "default": "Formulated by top fertility doctors|Clinically proven to increase key nutrient levels|Designed for those trying to get pregnant|Supports fertility and egg health|No nausea formula"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "t:labels.style",
+          "options": [
+            { "value": "product-benefits--subtle", "label": "t:options.style.subtle_background" },
+            { "value": "product-benefits--bordered", "label": "t:options.style.bordered" },
+            { "value": "product-benefits--none", "label": "t:options.style.none" }
+          ],
+          "default": "product-benefits--subtle"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "product-usp",
+      "name": "t:products.blocks.usp.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "selling_points",
+          "label": "t:products.blocks.usp.selling_points",
+          "info": "t:products.blocks.usp.selling_points_info",
+          "default": "Clinically Proven|Pregnancy Prep|Egg Health"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:labels.layout"
+    },
+    {
+      "type": "range",
+      "id": "gallery_width",
+      "label": "t:labels.gallery_width",
+      "min": 30,
+      "max": 70,
+      "step": 1,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "t:labels.content_max_width",
+      "min": 300,
+      "max": 800,
+      "step": 10,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "block_spacing",
+      "label": "t:labels.block_spacing",
+      "min": 8,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.product",
+      "blocks": [
+        {
+          "type": "product-title"
+        },
+        {
+          "type": "product-vendor"
+        },
+        {
+          "type": "product-price"
+        },
+        {
+          "type": "product-description"
+        },
+        {
+          "type": "product-form"
+        }
+      ]
+    }
+  ],
   "disabled_on": {
     "groups": ["header", "footer"]
   }

@@ -112,7 +112,17 @@
     "button_style": "Button style",
     "button_background_color": "Button background color",
     "button_text_color": "Button text color",
-    "button_font_size": "Button font size"
+    "button_font_size": "Button font size",
+    "label": "Label",
+    "size": "Size",
+    "layout": "Layout",
+    "style": "Style",
+    "title": "Title",
+    "block_spacing": "Block spacing",
+    "padding_top": "Padding top",
+    "padding_bottom": "Padding bottom",
+    "gallery_width": "Gallery width",
+    "content_max_width": "Content max width"
   },
   "options": {
     "alignment": {
@@ -130,12 +140,24 @@
     },
     "size": {
       "large": "Large",
+      "medium": "Medium",
       "small": "Small"
     },
     "text_style": {
       "title": "Title",
       "subtitle": "Subtitle",
-      "normal": "Normal text"
+      "normal": "Normal text",
+      "uppercase": "Uppercase",
+      "bold": "Bold"
+    },
+    "layout": {
+      "inline": "Inline",
+      "stacked": "Stacked"
+    },
+    "style": {
+      "subtle_background": "Subtle background",
+      "bordered": "Bordered",
+      "none": "None"
     },
     "cart_page": "Cart page",
     "cart_drawer": "Cart drawer",
@@ -152,7 +174,8 @@
     },
     "button_style": {
       "primary": "Primary",
-      "secondary": "Secondary"
+      "secondary": "Secondary",
+      "accent": "Accent"
     }
   },
   "info": {
@@ -161,5 +184,49 @@
     "free_shipping_message": "Use {amount} as placeholder for remaining amount",
     "free_shipping_success_message": "Message shown when free shipping is achieved",
     "cart_recommendations_collection": "Collection to use for product recommendations in cart"
+  },
+  "products": {
+    "blocks": {
+      "title": {
+        "name": "Product title",
+        "heading_level": "Heading level"
+      },
+      "vendor": {
+        "name": "Product vendor",
+        "show_vendor": "Show vendor"
+      },
+      "price": {
+        "name": "Product price",
+        "show_compare": "Show compare at price",
+        "show_savings": "Show savings amount"
+      },
+      "description": {
+        "name": "Product description",
+        "truncate": "Truncate description",
+        "truncate_length": "Truncation length"
+      },
+      "form": {
+        "name": "Product form",
+        "show_quantity": "Show quantity selector",
+        "show_dynamic_checkout": "Show dynamic checkout button",
+        "button_text": "Button text",
+        "button_text_info": "Leave blank to use default text"
+      },
+      "features": {
+        "name": "Product features",
+        "custom_content": "Custom content",
+        "custom_content_info": "If empty, will display product.metafields.custom.features"
+      },
+      "benefits": {
+        "name": "Product benefits",
+        "benefits_list": "Benefits list",
+        "benefits_list_info": "Separate each benefit with a pipe character (|)"
+      },
+      "usp": {
+        "name": "Unique selling points",
+        "selling_points": "Selling points",
+        "selling_points_info": "Separate each selling point with a pipe character (|)"
+      }
+    }
   }
 }
