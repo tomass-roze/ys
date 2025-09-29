@@ -150,6 +150,12 @@
       "uppercase": "Uppercase",
       "bold": "Bold"
     },
+    "text_transform": {
+      "none": "None",
+      "uppercase": "Uppercase",
+      "capitalize": "Capitalize",
+      "lowercase": "Lowercase"
+    },
     "layout": {
       "inline": "Inline",
       "stacked": "Stacked"
@@ -184,6 +190,95 @@
     "free_shipping_message": "Use {amount} as placeholder for remaining amount",
     "free_shipping_success_message": "Message shown when free shipping is achieved",
     "cart_recommendations_collection": "Collection to use for product recommendations in cart"
+  },
+  "blocks": {
+    "separator": {
+      "name": "Separator",
+      "settings": {
+        "color": {
+          "label": "Line color"
+        }
+      }
+    },
+    "guarantees": {
+      "name": "Guarantees",
+      "settings": {
+        "header": {
+          "guarantee_1": "Guarantee 1",
+          "guarantee_2": "Guarantee 2",
+          "guarantee_3": "Guarantee 3"
+        },
+        "icon": {
+          "label": "Icon",
+          "options": {
+            "none": "None",
+            "checkmark": "Checkmark",
+            "shield": "Shield",
+            "calendar": "Calendar",
+            "heart": "Heart",
+            "star": "Star",
+            "truck": "Truck"
+          }
+        },
+        "heading": {
+          "label": "Heading"
+        },
+        "text": {
+          "label": "Text"
+        }
+      }
+    },
+    "collapsible_content": {
+      "name": "Collapsible content",
+      "settings": {
+        "heading": {
+          "label": "Heading"
+        },
+        "content": {
+          "label": "Content"
+        },
+        "header": {
+          "collapsible": "Collapsible",
+          "heading_style": "Heading style",
+          "content_style": "Content style",
+          "borders": "Borders"
+        },
+        "enable_collapsible": {
+          "label": "Enable collapsible"
+        },
+        "default_open": {
+          "label": "Open by default",
+          "info": "Only applies when collapsible is enabled"
+        },
+        "heading_font_size": {
+          "label": "Heading font size"
+        },
+        "heading_line_height": {
+          "label": "Heading line height"
+        },
+        "heading_text_transform": {
+          "label": "Heading text style"
+        },
+        "content_font_size": {
+          "label": "Content font size"
+        },
+        "content_line_height": {
+          "label": "Content line height"
+        },
+        "content_text_transform": {
+          "label": "Content text style"
+        },
+        "show_border_top": {
+          "label": "Show top border"
+        },
+        "show_border_bottom": {
+          "label": "Show bottom border"
+        },
+        "border_color": {
+          "label": "Border color"
+        }
+      }
+    }
   },
   "products": {
     "blocks": {
