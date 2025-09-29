@@ -11,7 +11,37 @@
   "sections": {
     "main": {
       "type": "product",
-      "settings": {}
+      "blocks": {
+        "product_title_yt3Y49": {
+          "type": "product-title",
+          "settings": {
+            "heading_level": "h1",
+            "title_size": "product-title--medium",
+            "alignment": "left",
+            "padding_top": 0,
+            "padding_bottom": 0
+          }
+        },
+        "product_form_zz38nz": {
+          "type": "product-form",
+          "settings": {
+            "show_quantity": true,
+            "show_dynamic_checkout": true,
+            "button_text": "",
+            "padding_top": 0,
+            "padding_bottom": 0
+          }
+        }
+      },
+      "block_order": [
+        "product_title_yt3Y49",
+        "product_form_zz38nz"
+      ],
+      "settings": {
+        "gallery_width": 50,
+        "content_max_width": 440,
+        "block_spacing": 20
+      }
     }
   },
   "order": [
