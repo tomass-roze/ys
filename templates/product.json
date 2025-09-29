@@ -22,11 +22,29 @@
             "padding_bottom": 0
           }
         },
+        "product_usp_rwPHif": {
+          "type": "product-usp",
+          "settings": {
+            "selling_points": "Clinically Proven|Pregnancy Prep|Egg Health",
+            "padding_top": 0,
+            "padding_bottom": 0
+          }
+        },
+        "product_benefits_yhJi94": {
+          "type": "product-benefits",
+          "settings": {
+            "title": "Benefits",
+            "benefits": "Formulated by top fertility doctors|Clinically proven to increase key nutrient levels|Designed for those trying to get pregnant|Supports fertility and egg health|No nausea formula",
+            "style": "product-benefits--none",
+            "padding_top": 0,
+            "padding_bottom": 0
+          }
+        },
         "product_form_zz38nz": {
           "type": "product-form",
           "settings": {
-            "show_quantity": true,
-            "show_dynamic_checkout": true,
+            "show_quantity": false,
+            "show_dynamic_checkout": false,
             "button_text": "",
             "padding_top": 0,
             "padding_bottom": 0
@@ -35,6 +53,8 @@
       },
       "block_order": [
         "product_title_yt3Y49",
+        "product_usp_rwPHif",
+        "product_benefits_yhJi94",
         "product_form_zz38nz"
       ],
       "settings": {
