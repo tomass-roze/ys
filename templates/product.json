@@ -12,6 +12,18 @@
     "main": {
       "type": "product",
       "blocks": {
+        "review_stars_GfGqXz": {
+          "type": "review-stars",
+          "settings": {
+            "rating": 4.5,
+            "star_color": "#b8860b",
+            "review_text": "4.9/5.0 (2,127 Reviews)",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
         "product_title_yt3Y49": {
           "type": "product-title",
           "settings": {
@@ -19,7 +31,19 @@
             "title_size": "product-title--medium",
             "alignment": "left",
             "padding_top": 0,
-            "padding_bottom": 0
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "product_subtitle_YqVda7": {
+          "type": "product-subtitle",
+          "settings": {
+            "text": "Prepare your body for pregnancy",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
           }
         },
         "product_usp_rwPHif": {
@@ -27,17 +51,21 @@
           "settings": {
             "selling_points": "Clinically Proven|Pregnancy Prep|Egg Health",
             "padding_top": 0,
-            "padding_bottom": 0
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
           }
         },
         "product_benefits_yhJi94": {
           "type": "product-benefits",
           "settings": {
-            "title": "Benefits",
+            "title": "",
             "benefits": "Formulated by top fertility doctors|Clinically proven to increase key nutrient levels|Designed for those trying to get pregnant|Supports fertility and egg health|No nausea formula",
             "style": "product-benefits--none",
             "padding_top": 0,
-            "padding_bottom": 0
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
           }
         },
         "product_form_zz38nz": {
@@ -47,15 +75,33 @@
             "show_dynamic_checkout": false,
             "button_text": "",
             "padding_top": 0,
-            "padding_bottom": 0
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "selling_plan_iQqTbX": {
+          "type": "selling-plan",
+          "settings": {
+            "recommended_label": "RECOMMENDED",
+            "subscription_badge_text": "SAVE 25%",
+            "benefits": "Save 25% your first month|Save 15% every following month|Free shipping|Pause or cancel anytime",
+            "show_compare_price": true,
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
           }
         }
       },
       "block_order": [
+        "review_stars_GfGqXz",
         "product_title_yt3Y49",
+        "product_subtitle_YqVda7",
         "product_usp_rwPHif",
         "product_benefits_yhJi94",
-        "product_form_zz38nz"
+        "product_form_zz38nz",
+        "selling_plan_iQqTbX"
       ],
       "settings": {
         "gallery_width": 50,
