@@ -263,7 +263,8 @@
           "label": "Content type",
           "options": {
             "text": "Text",
-            "image": "Image"
+            "image": "Image",
+            "reviews": "Reviews"
           }
         },
         "content": {
@@ -276,7 +277,27 @@
           "collapsible": "Collapsible",
           "heading_style": "Heading style",
           "content_style": "Content style",
-          "borders": "Borders"
+          "borders": "Borders",
+          "review_1": "Review 1",
+          "review_2": "Review 2",
+          "review_3": "Review 3",
+          "review_4": "Review 4",
+          "review_5": "Review 5"
+        },
+        "review_stars": {
+          "label": "Stars"
+        },
+        "review_title": {
+          "label": "Title"
+        },
+        "review_text": {
+          "label": "Review text"
+        },
+        "review_author": {
+          "label": "Author name"
+        },
+        "review_verified": {
+          "label": "Verified buyer"
         },
         "enable_collapsible": {
           "label": "Enable collapsible"

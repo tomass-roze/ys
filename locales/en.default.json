@@ -105,6 +105,9 @@
   },
   "products": {
     "sold_out": "Sold out",
+    "reviews": {
+      "verified_buyer": "Verified Buyer"
+    },
     "blocks": {
       "review_stars": {
         "aria_label": "{{ rating }} out of 5 stars"
