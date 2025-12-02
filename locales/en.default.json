@@ -31,7 +31,7 @@
     "comment_form_title": "Add a comment"
   },
   "cart": {
-    "checkout": "Checkout",
+    "checkout": "Proceed to checkout",
     "title": "Cart",
     "your_cart": "Your cart",
     "update": "Update",
@@ -55,7 +55,17 @@
     "subscription_frequency": "Delivery frequency",
     "subscription_upgrade": "Upgrade to subscription",
     "one_time_purchase": "One-time purchase",
-    "subscribe_and_save": "Subscribe & save"
+    "subscribe_and_save": "Subscribe & save",
+    "adding": "Adding...",
+    "error_adding": "Could not add item to cart. Please try again.",
+    "month": "month",
+    "recurring_subscription": "Recurring subscription billed and shipped every month at {{ percentage }}% off every following order.",
+    "upgrade_cta": "Get an additional {{ percentage }}% OFF when you subscribe. Pause or cancel anytime.",
+    "subscribe_button": "Subscribe",
+    "subscriber_savings": "Subscriber Savings:",
+    "shipping": "Shipping:",
+    "calculated_at_checkout": "Calculated at checkout",
+    "free": "Free"
   },
   "customers": {
     "login": {
@@ -95,6 +105,11 @@
   },
   "products": {
     "sold_out": "Sold out",
+    "blocks": {
+      "review_stars": {
+        "aria_label": "{{ rating }} out of 5 stars"
+      }
+    },
     "product": {
       "add_to_cart": "Add to cart",
       "sold_out": "Sold out",

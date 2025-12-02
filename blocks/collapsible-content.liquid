@@ -1,0 +1,248 @@
+{% doc %}
+  Renders a collapsible content block with a heading and rich text content.
+  Can be used for FAQs, product details, shipping info, etc.
+
+  @example
+  {% content_for 'block', type: 'collapsible-content', id: 'description' %}
+{% enddoc %}
+
+{%- liquid
+  assign is_collapsible = block.settings.enable_collapsible
+  assign is_open = block.settings.default_open
+  assign heading = block.settings.heading
+  assign content = block.settings.content
+-%}
+
+<div
+  class="collapsible-content{% if block.settings.show_border_top %} collapsible-content--border-top{% endif %}{% if block.settings.show_border_bottom %} collapsible-content--border-bottom{% endif %}"
+  style="--border-color: {{ block.settings.border_color }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if is_collapsible -%}
+    <details class="collapsible-content__details"{% if is_open %} open{% endif %}>
+      <summary class="collapsible-content__header">
+        <span class="collapsible-content__heading">{{ heading }}</span>
+        <span class="collapsible-content__icon">
+          <svg class="collapsible-content__icon-plus" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="10" y1="4" x2="10" y2="16"></line>
+            <line x1="4" y1="10" x2="16" y2="10"></line>
+          </svg>
+          <svg class="collapsible-content__icon-minus" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="4" y1="10" x2="16" y2="10"></line>
+          </svg>
+        </span>
+      </summary>
+      <div class="collapsible-content__body">
+        <div class="collapsible-content__inner">
+          {{ content }}
+        </div>
+      </div>
+    </details>
+  {%- else -%}
+    <div class="collapsible-content__static">
+      <div class="collapsible-content__header collapsible-content__header--static">
+        <span class="collapsible-content__heading">{{ heading }}</span>
+      </div>
+      <div class="collapsible-content__body collapsible-content__body--static">
+        {{ content }}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .collapsible-content {
+    --border-color: #e5e5e5;
+    margin: 0;
+  }
+
+  .collapsible-content--border-top {
+    border-top: 1px solid var(--border-color);
+  }
+
+  .collapsible-content--border-bottom {
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  /* When collapsible blocks are adjacent, prevent double borders */
+  .collapsible-content--border-top + .collapsible-content--border-top,
+  .collapsible-content--border-bottom + .collapsible-content--border-top {
+    margin-top: -1px;
+  }
+
+  .collapsible-content__details {
+    width: 100%;
+  }
+
+  .collapsible-content__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .collapsible-content__header::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-content__header--static {
+    cursor: default;
+  }
+
+  .collapsible-content__heading {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .collapsible-content__icon {
+    flex-shrink: 0;
+    color: var(--color-accent, #b8a974);
+    transition: transform 0.2s ease;
+  }
+
+  .collapsible-content__icon-plus,
+  .collapsible-content__icon-minus {
+    display: block;
+  }
+
+  .collapsible-content__icon-minus {
+    display: none;
+  }
+
+  .collapsible-content__details[open] .collapsible-content__icon-plus {
+    display: none;
+  }
+
+  .collapsible-content__details[open] .collapsible-content__icon-minus {
+    display: block;
+  }
+
+  .collapsible-content__body {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.2s ease, padding 0.3s ease;
+  }
+
+  .collapsible-content__details[open] .collapsible-content__body {
+    max-height: 1000px;
+    opacity: 1;
+    padding-bottom: 1.25rem;
+  }
+
+  .collapsible-content__body--static {
+    max-height: none;
+    opacity: 1;
+    padding-bottom: 1.25rem;
+  }
+
+  .collapsible-content__inner {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-foreground, #333);
+  }
+
+  .collapsible-content__inner p {
+    margin: 0 0 1rem;
+  }
+
+  .collapsible-content__inner p:last-child {
+    margin-bottom: 0;
+  }
+
+  .collapsible-content__inner ul,
+  .collapsible-content__inner ol {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+  }
+
+  .collapsible-content__inner ul:last-child,
+  .collapsible-content__inner ol:last-child {
+    margin-bottom: 0;
+  }
+
+  .collapsible-content__inner li {
+    margin-bottom: 0.5rem;
+  }
+
+  .collapsible-content__inner li:last-child {
+    margin-bottom: 0;
+  }
+
+  .collapsible-content__inner a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .collapsible-content__inner a:hover {
+    opacity: 0.7;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:blocks.collapsible_content.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:blocks.collapsible_content.settings.heading.label",
+      "default": "Collapsible heading"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "t:blocks.collapsible_content.settings.content.label",
+      "default": "<p>Add your content here. You can use <strong>bold</strong>, <em>italic</em>, and lists.</p>"
+    },
+    {
+      "type": "header",
+      "content": "t:blocks.collapsible_content.settings.header.collapsible"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_collapsible",
+      "label": "t:blocks.collapsible_content.settings.enable_collapsible.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "default_open",
+      "label": "t:blocks.collapsible_content.settings.default_open.label",
+      "info": "t:blocks.collapsible_content.settings.default_open.info",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "t:blocks.collapsible_content.settings.header.borders"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border_top",
+      "label": "t:blocks.collapsible_content.settings.show_border_top.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border_bottom",
+      "label": "t:blocks.collapsible_content.settings.show_border_bottom.label",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "t:blocks.collapsible_content.settings.border_color.label",
+      "default": "#e5e5e5"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.collapsible_content.name"
+    }
+  ]
+}
+{% endschema %}

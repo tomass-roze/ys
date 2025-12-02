@@ -13,11 +13,18 @@
   style="
     --padding-top: {{ block.settings.padding_top | default: 0 }}px;
     --padding-bottom: {{ block.settings.padding_bottom | default: 0 }}px;
+    --margin-top: {{ block.settings.margin_top | default: 0 }}px;
+    --margin-bottom: {{ block.settings.margin_bottom | default: 0 }}px;
   "
   {{ block.shopify_attributes }}
 >
-  <div class="product-form-block">
-    {% form 'product', product, class: 'product-form' %}
+  <div
+    class="product-form-block"
+    data-cart-type="{{ settings.cart_type }}"
+    data-adding-text="{{ 'cart.adding' | t }}"
+    data-error-text="{{ 'cart.error_adding' | t }}"
+  >
+    {% form 'product', product, class: 'product-form', data-product-form: '' %}
     {%- assign current_variant = product.selected_or_first_available_variant -%}
 
     {%- if product.has_only_default_variant == false -%}
@@ -88,7 +95,8 @@
             {%- endif -%}
           </span>
           <span class="product-form__submit-separator">—</span>
-          <span class="product-form__submit-price">{{ current_variant.price | money }}</span>
+          <span class="product-form__submit-price" data-button-price>{{ current_variant.price | money }}</span>
+          <span class="product-form__submit-compare" data-button-compare style="display: none;"></span>
         {%- else -%}
           {{ 'products.product.sold_out' | t }}
         {%- endif -%}
@@ -106,6 +114,8 @@
   .product-block-wrapper {
     padding-top: var(--padding-top);
     padding-bottom: var(--padding-bottom);
+    margin-top: var(--margin-top);
+    margin-bottom: var(--margin-bottom);
   }
 
   .product-form-block {
@@ -181,12 +191,19 @@
 
   .product-form__submit-text,
   .product-form__submit-separator,
-  .product-form__submit-price {
+  .product-form__submit-price,
+  .product-form__submit-compare {
     display: inline-block;
   }
 
   .product-form__submit-separator {
     opacity: 0.6;
+  }
+
+  .product-form__submit-compare {
+    text-decoration: line-through;
+    opacity: 0.7;
+    margin-left: 0.25rem;
   }
 
   .product-form__submit:hover:not(:disabled) {
@@ -216,4 +233,103 @@
     width: 100%;
     min-height: 3rem;
   }
+
+  /* Hide subscription disclaimer below button */
+  .shopify-payment-button__more-options,
+  .selling-plan-disclaimer,
+  [data-shopify-selling-plan-disclaimer],
+  .product-form [class*="selling-plan"] + p,
+  .product-form__buttons ~ p[class*="disclaimer"],
+  .shopify-payment-button + p,
+  .product-form__buttons p,
+  .product-form p:last-child,
+  [data-selling-plan-description],
+  .selling-plan-description,
+  .product__policies,
+  [class*="deferred"],
+  [class*="recurring"],
+  .product-form small,
+  .product-form__submit + p,
+  .product-form__buttons + p,
+  form[action*="/cart/add"] > p:last-of-type,
+  form[action*="/cart/add"] small {
+    display: none !important;
+  }
 {% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    const formBlocks = document.querySelectorAll('[data-cart-type]');
+
+    formBlocks.forEach(block => {
+      const cartType = block.dataset.cartType;
+      if (cartType !== 'drawer') return;
+
+      const form = block.querySelector('[data-product-form]');
+      if (!form) return;
+
+      const addingText = block.dataset.addingText || 'Adding...';
+      const errorText = block.dataset.errorText || 'Could not add item to cart.';
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const submitButton = form.querySelector('[type="submit"]');
+        const originalButtonContent = submitButton.innerHTML;
+
+        // Disable button and show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span>' + addingText + '</span>';
+
+        // Build form data
+        const formData = new FormData(form);
+
+        fetch('/cart/add.js', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(item => {
+          // Update cart count in header
+          fetch('/cart.js')
+            .then(response => response.json())
+            .then(cart => {
+              // Update cart count badges
+              const countElements = document.querySelectorAll('[data-cart-count]');
+              countElements.forEach(el => {
+                el.textContent = cart.item_count;
+                el.style.display = cart.item_count > 0 ? '' : 'none';
+              });
+
+              // Update and open cart drawer
+              if (window.cartDrawer && window.cartDrawer.updateCart) {
+                window.cartDrawer.updateCart(cart);
+              }
+              if (window.openCartDrawer) {
+                window.openCartDrawer();
+              } else if (window.cartDrawer && window.cartDrawer.open) {
+                window.cartDrawer.open();
+              }
+            });
+
+          // Reset button
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalButtonContent;
+        })
+        .catch(error => {
+          console.error('Error adding to cart:', error);
+          // Reset button on error
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalButtonContent;
+          // Show error message
+          alert(errorText);
+        });
+      });
+    });
+  })();
+{% endjavascript %}

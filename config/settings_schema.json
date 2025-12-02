@@ -129,6 +129,13 @@
       },
       {
         "type": "checkbox",
+        "id": "free_shipping_for_subscriptions",
+        "label": "t:labels.free_shipping_for_subscriptions",
+        "default": true,
+        "info": "t:info.free_shipping_for_subscriptions"
+      },
+      {
+        "type": "checkbox",
         "id": "show_cart_recommendations",
         "label": "t:labels.show_cart_recommendations",
         "default": true
@@ -138,6 +145,30 @@
         "id": "cart_recommendations_collection",
         "label": "t:labels.cart_recommendations_collection",
         "info": "t:info.cart_recommendations_collection"
+      },
+      {
+        "type": "header",
+        "content": "t:labels.subscription_settings"
+      },
+      {
+        "type": "textarea",
+        "id": "subscription_upgrade_text",
+        "label": "t:labels.subscription_upgrade_text",
+        "default": "Get an additional {percentage}% OFF when you subscribe. Pause or cancel anytime.",
+        "info": "t:info.subscription_upgrade_text"
+      },
+      {
+        "type": "text",
+        "id": "subscription_button_text",
+        "label": "t:labels.subscription_button_text",
+        "default": "Subscribe"
+      },
+      {
+        "type": "textarea",
+        "id": "subscription_note_text",
+        "label": "t:labels.subscription_note_text",
+        "default": "Recurring subscription billed and shipped every month at {percentage}% off every following order.",
+        "info": "t:info.subscription_note_text"
       }
     ]
   }

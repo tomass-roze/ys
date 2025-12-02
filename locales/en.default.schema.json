@@ -122,8 +122,15 @@
     "block_spacing": "Block spacing",
     "padding_top": "Padding top",
     "padding_bottom": "Padding bottom",
+    "margin_top": "Margin top",
+    "margin_bottom": "Margin bottom",
     "gallery_width": "Gallery width",
-    "content_max_width": "Content max width"
+    "content_max_width": "Content max width",
+    "subscription_settings": "Subscription settings",
+    "subscription_upgrade_text": "Upgrade to subscription text",
+    "subscription_button_text": "Subscribe button text",
+    "subscription_note_text": "Subscription note text",
+    "free_shipping_for_subscriptions": "Free shipping for subscriptions"
   },
   "options": {
     "alignment": {
@@ -190,9 +197,26 @@
     "free_shipping_threshold": "Order amount required for free shipping (numeric value)",
     "free_shipping_message": "Use {amount} as placeholder for remaining amount",
     "free_shipping_success_message": "Message shown when free shipping is achieved",
-    "cart_recommendations_collection": "Collection to use for product recommendations in cart"
+    "cart_recommendations_collection": "Collection to use for product recommendations in cart",
+    "subscription_upgrade_text": "Use {percentage} as placeholder for savings percentage",
+    "subscription_note_text": "Use {percentage} as placeholder for savings percentage",
+    "free_shipping_for_subscriptions": "Show free shipping when cart contains subscription items"
   },
   "blocks": {
+    "review_stars": {
+      "name": "Review stars",
+      "settings": {
+        "rating": {
+          "label": "Star rating"
+        },
+        "star_color": {
+          "label": "Star color"
+        },
+        "review_text": {
+          "label": "Review text"
+        }
+      }
+    },
     "separator": {
       "name": "Separator",
       "settings": {
@@ -235,8 +259,18 @@
         "heading": {
           "label": "Heading"
         },
+        "content_type": {
+          "label": "Content type",
+          "options": {
+            "text": "Text",
+            "image": "Image"
+          }
+        },
         "content": {
           "label": "Content"
+        },
+        "image": {
+          "label": "Image"
         },
         "header": {
           "collapsible": "Collapsible",
@@ -322,6 +356,23 @@
         "name": "Unique selling points",
         "selling_points": "Selling points",
         "selling_points_info": "Separate each selling point with a pipe character (|)"
+      },
+      "subtitle": {
+        "name": "Subtitle"
+      },
+      "review_stars": {
+        "name": "Review stars",
+        "rating": "Star rating",
+        "star_color": "Star color",
+        "review_text": "Review text"
+      },
+      "selling_plan": {
+        "name": "Selling plan selector",
+        "recommended_label": "Recommended label",
+        "subscription_badge": "Subscription badge text",
+        "benefits": "Benefits list",
+        "benefits_info": "Separate each benefit with a pipe character (|)",
+        "show_compare_price": "Show compare at price"
       }
     }
   },

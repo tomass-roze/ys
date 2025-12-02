@@ -8,108 +8,164 @@
   {% render 'cart-line-item', item: item, drawer: true %}
 {% enddoc %}
 
+{%- liquid
+  # Check for selling plan status
+  assign has_selling_plan = false
+  assign can_upgrade = false
+
+  if item.selling_plan_allocation
+    assign has_selling_plan = true
+    assign selling_plan = item.selling_plan_allocation.selling_plan
+    assign subscription_price = item.selling_plan_allocation.price
+    assign original_price = item.variant.price
+    assign savings_amount = original_price | minus: subscription_price
+    assign savings_percent = savings_amount | times: 100.0 | divided_by: original_price | round
+  elsif item.variant.selling_plan_allocations.size > 0
+    assign can_upgrade = true
+    assign first_allocation = item.variant.selling_plan_allocations.first
+    assign subscription_price = first_allocation.price
+    assign original_price = item.variant.price
+    assign savings_amount = original_price | minus: subscription_price
+    assign savings_percent = savings_amount | times: 100.0 | divided_by: original_price | round
+  endif
+-%}
+
 <div class="cart-item" data-cart-item-key="{{ item.key }}">
-  <div class="cart-item__image">
-    {% if item.image %}
-      {{ item.image | image_url: width: 120, height: 120, crop: 'center' | image_tag: loading: 'lazy', alt: item.title }}
-    {% endif %}
-  </div>
+  {%- comment -%} Main row: Image, Details, Price, Actions {%- endcomment -%}
+  <div class="cart-item__main">
+    <div class="cart-item__image">
+      {% if item.image %}
+        {{ item.image | image_url: width: 120, height: 120, crop: 'center' | image_tag: loading: 'lazy', alt: item.title }}
+      {% endif %}
+    </div>
 
-  <div class="cart-item__details">
-    <h3 class="cart-item__title">
-      <a href="{{ item.url }}" class="cart-item__link">
-        {{ item.product.title }}
-      </a>
-    </h3>
+    <div class="cart-item__content">
+      <div class="cart-item__header">
+        <div class="cart-item__info">
+          <h3 class="cart-item__title">
+            <a href="{{ item.url }}" class="cart-item__link">
+              {{ item.product.title }}
+            </a>
+          </h3>
 
-    {% unless item.product.has_only_default_variant %}
-      <div class="cart-item__variant">
-        {% for option in item.variant.options %}
-          <span class="cart-item__variant-option">{{ option }}</span>
-          {% unless forloop.last %}/{% endunless %}
-        {% endfor %}
-      </div>
-    {% endunless %}
-
-    {% if item.properties.size > 0 %}
-      <dl class="cart-item__properties">
-        {% for property in item.properties %}
-          {% unless property.first contains '_' %}
-            <dt class="cart-item__property-label">{{ property.first }}:</dt>
-            <dd class="cart-item__property-value">
-              {% if property.last contains '/uploads/' %}
-                <a href="{{ property.last }}" target="_blank">{{ property.last | split: '/' | last }}</a>
-              {% else %}
-                {{ property.last }}
-              {% endif %}
-            </dd>
+          {% unless item.product.has_only_default_variant %}
+            <div class="cart-item__variant">
+              {{ item.variant.title }}
+            </div>
           {% endunless %}
-        {% endfor %}
-      </dl>
-    {% endif %}
 
-    {% comment %} Check for subscription eligibility {% endcomment %}
-    {% if item.selling_plan_allocation == nil and item.variant.selling_plan_allocations.size > 0 %}
-      <div class="cart-item__subscription-upgrade" data-subscription-upgrade>
-        <button type="button" class="cart-item__subscription-button" data-subscription-toggle>
-          {{ 'cart.upgrade_to_subscription' | t: percentage: 10 }}
-        </button>
-      </div>
-    {% endif %}
+          {%- if has_selling_plan -%}
+            <div class="cart-item__subscription-price">
+              <span class="cart-item__price-current">{{ subscription_price | money }}</span>
+              <span class="cart-item__price-frequency">/ {{ 'cart.month' | t }}</span>
+              {%- if original_price > subscription_price -%}
+                <span class="cart-item__price-original">{{ original_price | money }}</span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
 
-    <div class="cart-item__quantity-price">
-      <div class="cart-item__quantity">
-        <label for="quantity-{{ item.key }}" class="visually-hidden">{{ 'cart.quantity' | t }}</label>
-        <button type="button" class="cart-item__quantity-button" data-quantity-decrease aria-label="Decrease quantity">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M4 8h8"/>
-          </svg>
-        </button>
-        <input
-          type="number"
-          name="updates[]"
-          id="quantity-{{ item.key }}"
-          class="cart-item__quantity-input"
-          value="{{ item.quantity }}"
-          min="0"
-          data-quantity-input
-          data-cart-item-key="{{ item.key }}"
-        >
-        <button type="button" class="cart-item__quantity-button" data-quantity-increase aria-label="Increase quantity">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M8 4v8M4 8h8"/>
-          </svg>
-        </button>
+        {%- unless has_selling_plan -%}
+          <div class="cart-item__price">
+            <span class="cart-item__price-final">{{ item.final_line_price | money }}</span>
+          </div>
+        {%- endunless -%}
       </div>
 
-      <button type="button" class="cart-item__remove" data-cart-remove="{{ item.key }}" aria-label="{{ 'cart.remove' | t }}">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M3 6h14M8 6V4a1 1 0 011-1h2a1 1 0 011 1v2m3 0v11a1 1 0 01-1 1H6a1 1 0 01-1-1V6h10z"/>
-          <path d="M8 10v5M12 10v5"/>
-        </svg>
-      </button>
+      {%- comment -%} Actions row: Quantity and Remove {%- endcomment -%}
+      <div class="cart-item__actions">
+        <div class="cart-item__quantity">
+          <button type="button" class="cart-item__quantity-btn" data-quantity-decrease aria-label="Decrease quantity">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M2.5 6h7"/>
+            </svg>
+          </button>
+          <input
+            type="number"
+            name="updates[]"
+            id="quantity-{{ item.key }}"
+            class="cart-item__quantity-input"
+            value="{{ item.quantity }}"
+            min="0"
+            data-quantity-input
+            data-cart-item-key="{{ item.key }}"
+            aria-label="{{ 'cart.quantity' | t }}"
+          >
+          <button type="button" class="cart-item__quantity-btn" data-quantity-increase aria-label="Increase quantity">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 2.5v7M2.5 6h7"/>
+            </svg>
+          </button>
+        </div>
+
+        <button type="button" class="cart-item__remove" data-cart-remove="{{ item.key }}" aria-label="{{ 'cart.remove' | t }}">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.25">
+            <path d="M3 5h12M7 5V3.5a1 1 0 011-1h2a1 1 0 011 1V5m2 0v9.5a1 1 0 01-1 1H6a1 1 0 01-1-1V5h10z"/>
+            <path d="M7.5 8v5M10.5 8v5"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="cart-item__price">
-    {% if item.original_price != item.final_price %}
-      <span class="cart-item__original-price">{{ item.original_line_price | money }}</span>
-    {% endif %}
-    <span class="cart-item__final-price">{{ item.final_line_price | money }}</span>
-  </div>
+  {%- comment -%} Full-width subscription note (below the item) {%- endcomment -%}
+  {%- if has_selling_plan -%}
+    {%- liquid
+      assign subscription_note = settings.subscription_note_text | default: 'Recurring subscription billed and shipped every month at {percentage}% off every following order.'
+      assign subscription_note = subscription_note | replace: '{percentage}', savings_percent
+    -%}
+    <div class="cart-item__subscription-note">
+      <svg class="cart-item__subscription-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M1.75 7a5.25 5.25 0 1 0 1.54-3.71" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M1.75 1.75v1.5h1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>{{ subscription_note }}</span>
+    </div>
+  {%- endif -%}
+
+  {%- comment -%} Full-width subscription upgrade CTA (below the item) {%- endcomment -%}
+  {%- if can_upgrade -%}
+    {%- liquid
+      assign upgrade_text = settings.subscription_upgrade_text | default: 'Get an additional {percentage}% OFF when you subscribe. Pause or cancel anytime.'
+      assign upgrade_text = upgrade_text | replace: '{percentage}', savings_percent
+      assign button_text = settings.subscription_button_text | default: 'Subscribe'
+    -%}
+    <div class="cart-item__upgrade">
+      <div class="cart-item__upgrade-text">
+        {{ upgrade_text }}
+      </div>
+      <button
+        type="button"
+        class="cart-item__upgrade-button"
+        data-upgrade-subscription
+        data-item-key="{{ item.key }}"
+        data-variant-id="{{ item.variant.id }}"
+        data-selling-plan-id="{{ first_allocation.selling_plan.id }}"
+        data-quantity="{{ item.quantity }}"
+      >
+        {{ button_text }}
+      </button>
+    </div>
+  {%- endif -%}
 </div>
 
 {% stylesheet %}
   .cart-item {
-    display: flex;
-    gap: 1rem;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .cart-item__main {
+    display: flex;
+    gap: 0.875rem;
   }
 
   .cart-item__image {
-    flex: 0 0 80px;
-    width: 80px;
-    height: 80px;
+    flex: 0 0 72px;
+    width: 72px;
+    height: 72px;
     background: var(--color-background-secondary, #f5f5f5);
     border-radius: 8px;
     overflow: hidden;
@@ -121,13 +177,27 @@
     object-fit: cover;
   }
 
-  .cart-item__details {
+  .cart-item__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .cart-item__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .cart-item__info {
     flex: 1;
     min-width: 0;
   }
 
   .cart-item__title {
-    margin: 0 0 0.25rem;
+    margin: 0;
     font-size: 0.9375rem;
     font-weight: 500;
     line-height: 1.3;
@@ -136,10 +206,6 @@
   .cart-item__link {
     color: var(--color-foreground);
     text-decoration: none;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
 
   .cart-item__link:hover {
@@ -149,57 +215,129 @@
   .cart-item__variant {
     font-size: 0.8125rem;
     color: var(--color-foreground-secondary, #666);
-    margin-bottom: 0.5rem;
-  }
-
-  .cart-item__variant-option {
-    display: inline-block;
-    margin-right: 0.25rem;
+    margin-top: 0.125rem;
   }
 
   .cart-item__properties {
-    font-size: 0.8125rem;
-    margin: 0.5rem 0;
+    font-size: 0.75rem;
+    margin: 0.25rem 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
   }
 
   .cart-item__property-label {
-    display: inline;
     font-weight: 500;
-    margin-right: 0.25rem;
   }
 
   .cart-item__property-value {
-    display: inline;
     color: var(--color-foreground-secondary, #666);
     margin-right: 0.5rem;
   }
 
-  .cart-item__subscription-upgrade {
-    margin: 0.5rem 0;
+  /* Price column */
+  .cart-item__price {
+    text-align: right;
+    flex-shrink: 0;
   }
 
-  .cart-item__subscription-button {
-    padding: 0.375rem 0.75rem;
-    background: var(--color-success-light, #e8f5e9);
-    color: var(--color-success, #4caf50);
-    border: 1px solid var(--color-success, #4caf50);
-    border-radius: 4px;
-    font-size: 0.8125rem;
+  .cart-item__price-compare {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-foreground-secondary, #666);
+    text-decoration: line-through;
+  }
+
+  .cart-item__price-final {
+    font-size: 0.9375rem;
     font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
   }
 
-  .cart-item__subscription-button:hover {
-    background: var(--color-success, #4caf50);
-    color: white;
+  /* Subscription price (inline with details) */
+  .cart-item__subscription-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    margin-top: 0.375rem;
   }
 
-  .cart-item__quantity-price {
+  .cart-item__price-current {
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+
+  .cart-item__price-frequency {
+    font-size: 0.8125rem;
+    color: var(--color-foreground-secondary, #666);
+  }
+
+  .cart-item__price-original {
+    font-size: 0.8125rem;
+    color: var(--color-foreground-secondary, #666);
+    text-decoration: line-through;
+    margin-left: 0.25rem;
+  }
+
+  /* Subscription note (full width below item) */
+  .cart-item__subscription-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    background: var(--color-background-secondary, #f8f8f8);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: var(--color-foreground-secondary, #666);
+    line-height: 1.4;
+  }
+
+  .cart-item__subscription-icon {
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+  }
+
+  /* Upgrade CTA */
+  .cart-item__upgrade {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-top: 0.75rem;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    background: var(--color-accent-light, #f5f1e6);
+    border-radius: 6px;
+  }
+
+  .cart-item__upgrade-text {
+    font-size: 0.8125rem;
+    color: var(--color-foreground);
+    line-height: 1.35;
+  }
+
+  .cart-item__upgrade-button {
+    flex-shrink: 0;
+    padding: 0.5rem 0.875rem;
+    background: var(--color-accent, #b8a472);
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+  }
+
+  .cart-item__upgrade-button:hover {
+    background: var(--color-accent-dark, #a08a5a);
+  }
+
+  /* Actions row */
+  .cart-item__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .cart-item__quantity {
@@ -207,10 +345,9 @@
     align-items: center;
     border: 1px solid var(--color-border, #e5e5e5);
     border-radius: 4px;
-    overflow: hidden;
   }
 
-  .cart-item__quantity-button {
+  .cart-item__quantity-btn {
     background: none;
     border: none;
     width: 32px;
@@ -223,19 +360,20 @@
     transition: background-color 0.2s;
   }
 
-  .cart-item__quantity-button:hover {
+  .cart-item__quantity-btn:hover {
     background: var(--color-background-secondary, #f5f5f5);
   }
 
   .cart-item__quantity-input {
-    width: 48px;
+    width: 40px;
     height: 32px;
     text-align: center;
     border: none;
     border-left: 1px solid var(--color-border, #e5e5e5);
     border-right: 1px solid var(--color-border, #e5e5e5);
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     background: var(--color-background);
+    -moz-appearance: textfield;
   }
 
   .cart-item__quantity-input::-webkit-inner-spin-button,
@@ -247,56 +385,36 @@
   .cart-item__remove {
     background: none;
     border: none;
-    padding: 0.5rem;
-    margin: -0.5rem;
+    padding: 0.375rem;
     cursor: pointer;
-    color: var(--color-foreground-secondary, #666);
+    color: var(--color-foreground-secondary, #999);
     transition: color 0.2s;
   }
 
   .cart-item__remove:hover {
-    color: var(--color-error, #f44336);
-  }
-
-  .cart-item__price {
-    text-align: right;
-    min-width: max-content;
-  }
-
-  .cart-item__original-price {
-    display: block;
-    font-size: 0.8125rem;
-    color: var(--color-foreground-secondary, #666);
-    text-decoration: line-through;
-  }
-
-  .cart-item__final-price {
-    display: block;
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  .visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+    color: var(--color-error, #d32f2f);
   }
 
   @media (max-width: 480px) {
     .cart-item__image {
-      flex: 0 0 60px;
-      width: 60px;
-      height: 60px;
+      flex: 0 0 64px;
+      width: 64px;
+      height: 64px;
     }
 
     .cart-item__title {
       font-size: 0.875rem;
+    }
+
+    .cart-item__upgrade {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+    }
+
+    .cart-item__upgrade-button {
+      width: 100%;
+      text-align: center;
     }
   }
 {% endstylesheet %}
@@ -306,7 +424,8 @@
     // Quantity button handlers
     document.addEventListener('click', (e) => {
       if (e.target.closest('[data-quantity-decrease]')) {
-        const input = e.target.closest('.cart-item__quantity').querySelector('[data-quantity-input]');
+        const container = e.target.closest('.cart-item__quantity');
+        const input = container.querySelector('[data-quantity-input]');
         const currentValue = parseInt(input.value) || 0;
         if (currentValue > 0) {
           input.value = currentValue - 1;
@@ -315,7 +434,8 @@
       }
 
       if (e.target.closest('[data-quantity-increase]')) {
-        const input = e.target.closest('.cart-item__quantity').querySelector('[data-quantity-input]');
+        const container = e.target.closest('.cart-item__quantity');
+        const input = container.querySelector('[data-quantity-input]');
         const currentValue = parseInt(input.value) || 0;
         input.value = currentValue + 1;
         updateCartQuantity(input);
@@ -329,10 +449,9 @@
       }
 
       // Subscription upgrade handler
-      if (e.target.closest('[data-subscription-toggle]')) {
-        const button = e.target.closest('[data-subscription-toggle]');
-        // Implementation for subscription upgrade would go here
-        console.log('Subscription upgrade clicked');
+      if (e.target.closest('[data-upgrade-subscription]')) {
+        const button = e.target.closest('[data-upgrade-subscription]');
+        upgradeToSubscription(button);
       }
     });
 
@@ -363,12 +482,9 @@
         })
         .then(response => response.json())
         .then(cart => {
-          // Update cart drawer if it exists
           if (window.cartDrawer) {
             window.cartDrawer.updateCart(cart);
           }
-
-          // Update cart count in header
           updateCartCount(cart.item_count);
         })
         .catch(error => {
@@ -391,12 +507,9 @@
       })
       .then(response => response.json())
       .then(cart => {
-        // Update cart drawer if it exists - this will handle DOM updates
         if (window.cartDrawer) {
           window.cartDrawer.updateCart(cart);
         }
-
-        // Update cart count in header
         updateCartCount(cart.item_count);
       })
       .catch(error => {
@@ -408,12 +521,68 @@
       const cartCounts = document.querySelectorAll('[data-cart-count]');
       cartCounts.forEach(el => {
         el.textContent = count;
-        if (count === 0) {
-          el.style.display = 'none';
-        } else {
-          el.style.display = '';
-        }
+        el.style.display = count === 0 ? 'none' : '';
       });
+    }
+
+    async function upgradeToSubscription(button) {
+      const itemKey = button.dataset.itemKey;
+      const variantId = button.dataset.variantId;
+      const sellingPlanId = button.dataset.sellingPlanId;
+      const quantity = parseInt(button.dataset.quantity) || 1;
+
+      // Disable button during process
+      button.disabled = true;
+      const originalText = button.textContent;
+      button.textContent = '...';
+
+      try {
+        // Step 1: Remove the current one-time item
+        await fetch('/cart/change.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            id: itemKey,
+            quantity: 0
+          })
+        });
+
+        // Step 2: Add the item with the selling plan
+        const addResponse = await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            id: variantId,
+            quantity: quantity,
+            selling_plan: sellingPlanId
+          })
+        });
+
+        if (!addResponse.ok) {
+          throw new Error('Failed to add subscription item');
+        }
+
+        // Step 3: Get updated cart and refresh drawer
+        const cartResponse = await fetch('/cart.js');
+        const cart = await cartResponse.json();
+
+        if (window.cartDrawer) {
+          window.cartDrawer.updateCart(cart);
+        }
+        updateCartCount(cart.item_count);
+
+      } catch (error) {
+        console.error('Error upgrading to subscription:', error);
+        // Reset button on error
+        button.disabled = false;
+        button.textContent = originalText;
+      }
     }
   });
 {% endjavascript %}

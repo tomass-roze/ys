@@ -35,6 +35,9 @@
         {%- when 'product-form' -%}
           {% render 'product-form', block: block, product: product %}
 
+        {%- when 'selling-plan' -%}
+          {% render 'product-selling-plan', block: block, product: product %}
+
         {%- when 'product-features' -%}
           {% render 'product-features', block: block, product: product %}
 
@@ -44,12 +47,31 @@
         {%- when 'product-usp' -%}
           {% render 'product-usp', block: block, product: product %}
 
+        {%- when 'product-subtitle' -%}
+          <p
+            class="product-subtitle"
+            style="
+              --padding-top: {{ block.settings.padding_top }}px;
+              --padding-bottom: {{ block.settings.padding_bottom }}px;
+              --margin-top: {{ block.settings.margin_top }}px;
+              --margin-bottom: {{ block.settings.margin_bottom }}px;
+            "
+            {{ block.shopify_attributes }}
+          >
+            {{- block.settings.text -}}
+          </p>
+
+        {%- when 'review-stars' -%}
+          {% render 'product-review-stars', block: block %}
+
         {%- when 'guarantees' -%}
           <div
             class="product-guarantees"
             style="
               --padding-top: {{ block.settings.padding_top }}px;
               --padding-bottom: {{ block.settings.padding_bottom }}px;
+              --margin-top: {{ block.settings.margin_top }}px;
+              --margin-bottom: {{ block.settings.margin_bottom }}px;
             "
             {{ block.shopify_attributes }}
           >
@@ -124,6 +146,8 @@
               --border-color: {{ block.settings.border_color }};
               --padding-top: {{ block.settings.padding_top }}px;
               --padding-bottom: {{ block.settings.padding_bottom }}px;
+              --margin-top: {{ block.settings.margin_top }}px;
+              --margin-bottom: {{ block.settings.margin_bottom }}px;
             "
             {{ block.shopify_attributes }}
           >
@@ -142,7 +166,13 @@
                   </summary>
                 {%- endif -%}
                 <div class="product-collapsible__content">
-                  {{ block.settings.content }}
+                  {%- if block.settings.content_type == 'image' and block.settings.image -%}
+                    <button type="button" class="product-collapsible__image-trigger" data-lightbox-trigger>
+                      {{ block.settings.image | image_url: width: 800 | image_tag: class: 'product-collapsible__image', loading: 'lazy' }}
+                    </button>
+                  {%- else -%}
+                    {{ block.settings.content }}
+                  {%- endif -%}
                 </div>
               </details>
             {%- else -%}
@@ -151,7 +181,13 @@
                   <div class="product-collapsible__heading">{{ block.settings.heading }}</div>
                 {%- endif -%}
                 <div class="product-collapsible__content">
-                  {{ block.settings.content }}
+                  {%- if block.settings.content_type == 'image' and block.settings.image -%}
+                    <button type="button" class="product-collapsible__image-trigger" data-lightbox-trigger>
+                      {{ block.settings.image | image_url: width: 800 | image_tag: class: 'product-collapsible__image', loading: 'lazy' }}
+                    </button>
+                  {%- else -%}
+                    {{ block.settings.content }}
+                  {%- endif -%}
                 </div>
               </div>
             {%- endif -%}
@@ -168,6 +204,8 @@
               --separator-color: {{ block.settings.color }};
               --separator-padding-top: {{ block.settings.padding_top }}px;
               --separator-padding-bottom: {{ block.settings.padding_bottom }}px;
+              --separator-margin-top: {{ block.settings.margin_top }}px;
+              --separator-margin-bottom: {{ block.settings.margin_bottom }}px;
             "
             {{ block.shopify_attributes }}
           >
@@ -176,6 +214,35 @@
           {% render block %}
       {%- endcase -%}
     {%- endfor -%}
+  </div>
+</div>
+
+{%- comment -%} Lightbox for collapsible content images {%- endcomment -%}
+<div class="lightbox" data-lightbox hidden>
+  <div class="lightbox__backdrop" data-lightbox-close></div>
+  <div class="lightbox__container">
+    <button type="button" class="lightbox__close" data-lightbox-close aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+    <div class="lightbox__content" data-lightbox-content>
+      <img class="lightbox__image" data-lightbox-image src="" alt="">
+    </div>
+    <button type="button" class="lightbox__zoom" data-lightbox-zoom aria-label="Zoom">
+      <svg class="lightbox__zoom-in" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <line x1="11" y1="8" x2="11" y2="14"></line>
+        <line x1="8" y1="11" x2="14" y2="11"></line>
+      </svg>
+      <svg class="lightbox__zoom-out" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <line x1="8" y1="11" x2="14" y2="11"></line>
+      </svg>
+    </button>
   </div>
 </div>
 
@@ -237,6 +304,8 @@
     width: 100%;
     padding-top: var(--padding-top);
     padding-bottom: var(--padding-bottom);
+    margin-top: var(--margin-top);
+    margin-bottom: var(--margin-bottom);
   }
 
   .product-guarantees__list {
@@ -290,6 +359,18 @@
     width: 100%;
     padding-top: var(--padding-top);
     padding-bottom: var(--padding-bottom);
+    margin-top: var(--margin-top);
+    margin-bottom: var(--margin-bottom);
+  }
+
+  /* Stack collapsible blocks without gaps - use negative margin to counteract the parent gap */
+  .product-collapsible + .product-collapsible {
+    margin-top: calc(var(--block-spacing, 32px) * -1);
+  }
+
+  /* Prevent double borders when blocks are adjacent */
+  .product-collapsible:has(.product-collapsible__border--bottom) + .product-collapsible .product-collapsible__border--top {
+    display: none;
   }
 
   .product-collapsible__border {
@@ -299,11 +380,11 @@
   }
 
   .product-collapsible__border--top {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0;
   }
 
   .product-collapsible__border--bottom {
-    margin-top: 0.25rem;
+    margin-top: 0;
   }
 
   .product-collapsible__heading {
@@ -371,6 +452,20 @@
     }
   }
 
+  /* Subtitle */
+  .product-subtitle {
+    margin: 0;
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    margin-top: var(--margin-top);
+    margin-bottom: var(--margin-bottom);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6b6b6b;
+  }
+
   /* Separator */
   .product-separator {
     border: none;
@@ -380,8 +475,223 @@
     width: 100%;
     padding-top: var(--separator-padding-top);
     padding-bottom: var(--separator-padding-bottom);
+    margin-top: var(--separator-margin-top);
+    margin-bottom: var(--separator-margin-bottom);
+  }
+
+  /* Image trigger in collapsible content */
+  .product-collapsible__image-trigger {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: zoom-in;
+    margin: 0.75rem 0;
+  }
+
+  .product-collapsible__image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox[hidden] {
+    display: none;
+  }
+
+  .lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    cursor: pointer;
+  }
+
+  .lightbox__container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 3rem;
+  }
+
+  .lightbox__close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 3;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .lightbox__close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lightbox__content {
+    position: relative;
+    z-index: 1;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox__image {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    transition: transform 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;
+    cursor: zoom-in;
+  }
+
+  .lightbox.is-zoomed .lightbox__image {
+    max-width: none;
+    max-height: none;
+    cursor: zoom-out;
+  }
+
+  .lightbox.is-zoomed .lightbox__content {
+    cursor: grab;
+  }
+
+  .lightbox.is-zoomed .lightbox__content:active {
+    cursor: grabbing;
+  }
+
+  .lightbox__zoom {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 3;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .lightbox__zoom:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lightbox__zoom-out {
+    display: none;
+  }
+
+  .lightbox.is-zoomed .lightbox__zoom-in {
+    display: none;
+  }
+
+  .lightbox.is-zoomed .lightbox__zoom-out {
+    display: block;
   }
 {% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    const lightbox = document.querySelector('[data-lightbox]');
+    if (!lightbox) return;
+
+    const lightboxImage = lightbox.querySelector('[data-lightbox-image]');
+    const lightboxContent = lightbox.querySelector('[data-lightbox-content]');
+    const closeButtons = lightbox.querySelectorAll('[data-lightbox-close]');
+    const zoomButton = lightbox.querySelector('[data-lightbox-zoom]');
+
+    function openLightbox(imageSrc, imageAlt) {
+      if (!lightboxImage) return;
+      // Get high-res version by replacing width parameter
+      const highResSrc = imageSrc.replace(/width=\d+/, 'width=2000');
+      lightboxImage.src = highResSrc;
+      lightboxImage.alt = imageAlt || '';
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.hidden = true;
+      lightbox.classList.remove('is-zoomed');
+      lightboxImage.src = '';
+      document.body.style.overflow = '';
+      if (lightboxContent) {
+        lightboxContent.scrollTop = 0;
+        lightboxContent.scrollLeft = 0;
+      }
+    }
+
+    function toggleZoom() {
+      lightbox.classList.toggle('is-zoomed');
+      if (lightboxContent) {
+        lightboxContent.scrollTop = 0;
+        lightboxContent.scrollLeft = 0;
+      }
+    }
+
+    // Open lightbox when clicking image triggers
+    document.querySelectorAll('[data-lightbox-trigger]').forEach(function(trigger) {
+      trigger.addEventListener('click', function() {
+        const img = trigger.querySelector('img');
+        if (img) {
+          openLightbox(img.src, img.alt);
+        }
+      });
+    });
+
+    // Close lightbox
+    closeButtons.forEach(function(btn) {
+      btn.addEventListener('click', closeLightbox);
+    });
+
+    // Zoom toggle via button
+    if (zoomButton) {
+      zoomButton.addEventListener('click', toggleZoom);
+    }
+
+    // Zoom toggle via clicking image
+    if (lightboxImage) {
+      lightboxImage.addEventListener('click', toggleZoom);
+    }
+
+    // Close on ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !lightbox.hidden) {
+        closeLightbox();
+      }
+    });
+  })();
+{% endjavascript %}
 
 {% schema %}
 {
@@ -439,6 +749,26 @@
           "step": 4,
           "unit": "px",
           "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
         }
       ]
     },
@@ -485,6 +815,26 @@
           "id": "padding_bottom",
           "label": "t:labels.padding_bottom",
           "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
           "max": 80,
           "step": 4,
           "unit": "px",
@@ -544,6 +894,26 @@
           "step": 4,
           "unit": "px",
           "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
         }
       ]
     },
@@ -593,6 +963,26 @@
           "step": 4,
           "unit": "px",
           "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
         }
       ]
     },
@@ -634,6 +1024,98 @@
           "id": "padding_bottom",
           "label": "t:labels.padding_bottom",
           "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "selling-plan",
+      "name": "t:products.blocks.selling_plan.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "recommended_label",
+          "label": "t:products.blocks.selling_plan.recommended_label",
+          "default": "RECOMMENDED"
+        },
+        {
+          "type": "text",
+          "id": "subscription_badge_text",
+          "label": "t:products.blocks.selling_plan.subscription_badge",
+          "default": "SAVE 25%"
+        },
+        {
+          "type": "textarea",
+          "id": "benefits",
+          "label": "t:products.blocks.selling_plan.benefits",
+          "info": "t:products.blocks.selling_plan.benefits_info",
+          "default": "Save 25% your first month|Save 15% every following month|Free shipping|Pause or cancel anytime"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_compare_price",
+          "label": "t:products.blocks.selling_plan.show_compare_price",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
           "max": 80,
           "step": 4,
           "unit": "px",
@@ -683,6 +1165,26 @@
           "id": "padding_bottom",
           "label": "t:labels.padding_bottom",
           "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
           "max": 80,
           "step": 4,
           "unit": "px",
@@ -737,6 +1239,26 @@
           "step": 4,
           "unit": "px",
           "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
         }
       ]
     },
@@ -771,6 +1293,147 @@
           "step": 4,
           "unit": "px",
           "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "product-subtitle",
+      "name": "t:products.blocks.subtitle.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "t:labels.text",
+          "default": "Prepare your body for pregnancy"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "review-stars",
+      "name": "t:products.blocks.review_stars.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "t:products.blocks.review_stars.rating",
+          "min": 0,
+          "max": 5,
+          "step": 0.5,
+          "default": 4.5
+        },
+        {
+          "type": "color",
+          "id": "star_color",
+          "label": "t:products.blocks.review_stars.star_color",
+          "default": "#B8860B"
+        },
+        {
+          "type": "text",
+          "id": "review_text",
+          "label": "t:products.blocks.review_stars.review_text",
+          "default": "4.9/5.0 (2,127 Reviews)"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "t:labels.padding_top",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "t:labels.padding_bottom",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
         }
       ]
     },
@@ -785,10 +1448,27 @@
           "default": "Product Description"
         },
         {
+          "type": "select",
+          "id": "content_type",
+          "label": "t:blocks.collapsible_content.settings.content_type.label",
+          "options": [
+            { "value": "text", "label": "t:blocks.collapsible_content.settings.content_type.options.text" },
+            { "value": "image", "label": "t:blocks.collapsible_content.settings.content_type.options.image" }
+          ],
+          "default": "text"
+        },
+        {
           "type": "richtext",
           "id": "content",
           "label": "t:blocks.collapsible_content.settings.content.label",
-          "default": "<p>Add your product details here.</p>"
+          "default": "<p>Add your product details here.</p>",
+          "visible_if": "{{ block.settings.content_type == 'text' }}"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:blocks.collapsible_content.settings.image.label",
+          "visible_if": "{{ block.settings.content_type == 'image' }}"
         },
         {
           "type": "header",
@@ -907,7 +1587,7 @@
           "max": 80,
           "step": 4,
           "unit": "px",
-          "default": 16
+          "default": 0
         },
         {
           "type": "range",
@@ -917,7 +1597,27 @@
           "max": 80,
           "step": 4,
           "unit": "px",
-          "default": 16
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
         }
       ]
     },
@@ -1036,6 +1736,26 @@
           "step": 4,
           "unit": "px",
           "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
         }
       ]
     },
@@ -1064,6 +1784,26 @@
           "id": "padding_bottom",
           "label": "t:labels.padding_bottom",
           "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_top",
+          "label": "t:labels.margin_top",
+          "min": -40,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "margin_bottom",
+          "label": "t:labels.margin_bottom",
+          "min": -40,
           "max": 80,
           "step": 4,
           "unit": "px",

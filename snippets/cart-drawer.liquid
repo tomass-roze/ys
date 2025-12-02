@@ -88,13 +88,71 @@
 
     {% if cart.item_count > 0 %}
       <footer class="cart-drawer__footer">
-        <div class="cart-drawer__subtotal">
-          <span>{{ 'cart.subtotal' | t }}</span>
-          <span class="cart-drawer__subtotal-price">{{ cart.total_price | money }}</span>
+        {%- comment -%} Cart Summary Lines {%- endcomment -%}
+        <div class="cart-drawer__summary">
+          {%- comment -%} Calculate subscription savings {%- endcomment -%}
+          {%- liquid
+            assign has_subscription = false
+            assign total_subscription_savings = 0
+
+            for item in cart.items
+              if item.selling_plan_allocation
+                assign has_subscription = true
+                assign item_savings = item.variant.price | minus: item.selling_plan_allocation.price
+                assign item_savings = item_savings | times: item.quantity
+                assign total_subscription_savings = total_subscription_savings | plus: item_savings
+              endif
+            endfor
+          -%}
+
+          {%- if has_subscription and total_subscription_savings > 0 -%}
+            <div class="cart-drawer__summary-line">
+              <span>{{ 'cart.subscriber_savings' | t }}</span>
+              <span class="cart-drawer__summary-savings">-{{ total_subscription_savings | money }}</span>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%} Shipping line {%- endcomment -%}
+          {%- liquid
+            assign show_free_shipping = false
+
+            # Check threshold-based free shipping
+            if settings.show_free_shipping_threshold
+              assign threshold = settings.free_shipping_threshold | times: 100
+              if cart.total_price >= threshold
+                assign show_free_shipping = true
+              endif
+            endif
+
+            # Check subscription-based free shipping
+            if settings.free_shipping_for_subscriptions and has_subscription
+              assign show_free_shipping = true
+            endif
+          -%}
+          <div class="cart-drawer__summary-line">
+            <span>{{ 'cart.shipping' | t }}</span>
+            <span>
+              {%- if show_free_shipping -%}
+                {{ 'cart.free' | t }}
+              {%- else -%}
+                {{ 'cart.calculated_at_checkout' | t }}
+              {%- endif -%}
+            </span>
+          </div>
+
+          {%- comment -%} Subtotal {%- endcomment -%}
+          <div class="cart-drawer__summary-line cart-drawer__summary-line--total">
+            <span>{{ 'cart.subtotal' | t }}</span>
+            <span>{{ cart.total_price | money }}</span>
+          </div>
         </div>
 
-        <form action="{{ routes.cart_url }}" method="post">
+        {%- comment -%} Checkout Button {%- endcomment -%}
+        <form action="{{ routes.cart_url }}" method="post" class="cart-drawer__checkout-form" data-checkout-form>
           <button type="submit" name="checkout" class="cart-drawer__checkout-button">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+              <path d="M11.5 5H10V3.5a3 3 0 1 0-6 0V5H2.5A.5.5 0 0 0 2 5.5v7a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.5-.5ZM5 3.5a2 2 0 1 1 4 0V5H5V3.5Z"/>
+            </svg>
             {{ 'cart.checkout' | t }}
           </button>
         </form>
@@ -140,7 +198,7 @@
   .cart-drawer__container {
     position: relative;
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
     height: 100%;
     background: var(--color-background);
     display: flex;
@@ -303,32 +361,65 @@
     padding: 1.5rem;
     border-top: 1px solid var(--color-border, #e5e5e5);
     background: var(--color-background);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 
-  .cart-drawer__subtotal {
+  /* Summary Lines */
+  .cart-drawer__summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cart-drawer__summary-line {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
-    font-size: 1.125rem;
+    font-size: 0.9375rem;
+  }
+
+  .cart-drawer__summary-line--total {
     font-weight: 600;
+    font-size: 1rem;
+    padding-top: 0.5rem;
+  }
+
+  .cart-drawer__summary-savings {
+    color: var(--color-success, #4caf50);
+  }
+
+  /* Checkout Button - Pill Style */
+  .cart-drawer__checkout-form {
+    margin-top: 0.5rem;
   }
 
   .cart-drawer__checkout-button {
     width: 100%;
-    padding: 1rem;
-    background: var(--color-primary, #000);
-    color: var(--color-background);
+    padding: 1rem 1.5rem;
+    background: var(--color-accent, #c4a77d);
+    color: #ffffff;
     border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
   .cart-drawer__checkout-button:hover {
-    opacity: 0.9;
+    background: var(--color-accent-dark, #a08a5a);
+  }
+
+  .cart-drawer__checkout-button svg {
+    flex-shrink: 0;
   }
 
   @media (max-width: 480px) {
@@ -514,4 +605,5 @@
       }
     }
   });
+
 {% endjavascript %}

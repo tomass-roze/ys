@@ -1,0 +1,487 @@
+{% doc %}
+  Renders a selling plan selector for subscription products.
+  Displays subscription vs one-time purchase options with dynamic pricing.
+
+  @param {block} block - The block object containing settings
+  @param {product} product - The product object
+
+  @example
+  {% render 'product-selling-plan', block: block, product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign has_selling_plans = false
+
+  if product.selling_plan_groups.size > 0
+    assign has_selling_plans = true
+    assign selling_plan_group = product.selling_plan_groups.first
+    assign selling_plan = selling_plan_group.selling_plans.first
+  endif
+-%}
+
+{%- if has_selling_plans -%}
+  {%- liquid
+    # Get the allocation for the current variant and selling plan
+    assign current_allocation = nil
+    for allocation in current_variant.selling_plan_allocations
+      if allocation.selling_plan.id == selling_plan.id
+        assign current_allocation = allocation
+        break
+      endif
+    endfor
+
+    # Calculate savings percentage
+    assign onetime_price = current_variant.price
+    assign subscription_price = current_allocation.price
+    assign savings_amount = onetime_price | minus: subscription_price
+    assign savings_percent = savings_amount | times: 100.0 | divided_by: onetime_price | round
+
+    # Parse benefits list
+    assign benefits = block.settings.benefits | split: '|'
+  -%}
+
+  {%- comment -%} Build variant prices JSON for JavaScript {%- endcomment -%}
+  {%- capture variant_prices_json -%}
+  {
+    {%- for variant in product.variants -%}
+      "{{ variant.id }}": {
+        "onetime": {{ variant.price }},
+        "onetimeFormatted": "{{ variant.price | money }}",
+        "compareAt": {{ variant.compare_at_price | default: variant.price }},
+        "compareAtFormatted": "{{ variant.compare_at_price | default: variant.price | money }}"
+        {%- for allocation in variant.selling_plan_allocations -%}
+          {%- if allocation.selling_plan.id == selling_plan.id -%}
+            ,"subscription": {{ allocation.price }}
+            ,"subscriptionFormatted": "{{ allocation.price | money }}"
+            ,"subscriptionCompareAt": {{ allocation.compare_at_price | default: allocation.price }}
+            ,"subscriptionCompareAtFormatted": "{{ allocation.compare_at_price | default: allocation.price | money }}"
+          {%- endif -%}
+        {%- endfor -%}
+      }{%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  }
+  {%- endcapture -%}
+
+  <div
+    class="selling-plan-selector"
+    style="
+      --padding-top: {{ block.settings.padding_top | default: 0 }}px;
+      --padding-bottom: {{ block.settings.padding_bottom | default: 0 }}px;
+      --margin-top: {{ block.settings.margin_top | default: 0 }}px;
+      --margin-bottom: {{ block.settings.margin_bottom | default: 0 }}px;
+    "
+    data-selling-plan-selector
+    data-selling-plan-id="{{ selling_plan.id }}"
+    data-variant-prices='{{ variant_prices_json | strip_newlines }}'
+    {{ block.shopify_attributes }}
+  >
+    {%- comment -%} Subscription Option {%- endcomment -%}
+    <div class="selling-plan-option selling-plan-option--subscription selling-plan-option--selected" data-option="subscription">
+      {%- if block.settings.recommended_label != blank -%}
+        <div class="selling-plan-option__badge">{{ block.settings.recommended_label }}</div>
+      {%- endif -%}
+
+      <label class="selling-plan-option__header">
+        <input
+          type="radio"
+          name="selling_plan_option"
+          value="subscription"
+          checked
+          class="selling-plan-option__radio"
+        >
+        <span class="selling-plan-option__radio-custom"></span>
+        <span class="selling-plan-option__title">
+          {{ 'cart.subscribe_and_save' | t }}
+          {%- if block.settings.subscription_badge_text != blank -%}
+            <span class="selling-plan-option__savings-badge">{{ block.settings.subscription_badge_text }}</span>
+          {%- endif -%}
+        </span>
+        <span class="selling-plan-option__price">
+          <span class="selling-plan-option__price-current" data-subscription-price>
+            {{ subscription_price | money }}
+          </span>
+          {%- if onetime_price > subscription_price -%}
+            <span class="selling-plan-option__price-compare" data-subscription-compare>
+              {{ onetime_price | money }}
+            </span>
+          {%- endif -%}
+        </span>
+      </label>
+
+      {%- if benefits.size > 0 -%}
+        <ul class="selling-plan-option__benefits">
+          {%- for benefit in benefits -%}
+            {%- assign trimmed_benefit = benefit | strip -%}
+            {%- if trimmed_benefit != blank -%}
+              <li class="selling-plan-option__benefit">
+                <svg class="selling-plan-option__benefit-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M13.333 4L6 11.333 2.667 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                {{ trimmed_benefit }}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} One-Time Purchase Option {%- endcomment -%}
+    <div class="selling-plan-option selling-plan-option--onetime" data-option="onetime">
+      <label class="selling-plan-option__header">
+        <input
+          type="radio"
+          name="selling_plan_option"
+          value="onetime"
+          class="selling-plan-option__radio"
+        >
+        <span class="selling-plan-option__radio-custom"></span>
+        <span class="selling-plan-option__title">{{ 'cart.one_time_purchase' | t }}</span>
+        <span class="selling-plan-option__price">
+          <span class="selling-plan-option__price-current" data-onetime-price>
+            {{ onetime_price | money }}
+          </span>
+          {%- if block.settings.show_compare_price and current_variant.compare_at_price > onetime_price -%}
+            <span class="selling-plan-option__price-compare" data-onetime-compare>
+              {{ current_variant.compare_at_price | money }}
+            </span>
+          {%- endif -%}
+        </span>
+      </label>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .selling-plan-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    margin-top: var(--margin-top);
+    margin-bottom: var(--margin-bottom);
+  }
+
+  .selling-plan-option {
+    position: relative;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .selling-plan-option--selected {
+    border-color: #b8a472;
+    background-color: #faf8f3;
+  }
+
+  .selling-plan-option--subscription.selling-plan-option--selected {
+    border-color: #b8a472;
+    background-color: #f5f1e6;
+  }
+
+  .selling-plan-option__badge {
+    position: absolute;
+    top: 0;
+    left: 1rem;
+    transform: translateY(-50%);
+    background-color: #f5f1e6;
+    color: #6b6b6b;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.25rem 0.5rem;
+    border-radius: 2px;
+  }
+
+  .selling-plan-option--selected .selling-plan-option__badge {
+    background-color: #b8a472;
+    color: #ffffff;
+  }
+
+  .selling-plan-option__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+
+  .selling-plan-option__radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .selling-plan-option__radio-custom {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d0d0d0;
+    border-radius: 50%;
+    background-color: #ffffff;
+    position: relative;
+    transition: border-color 0.2s ease;
+  }
+
+  .selling-plan-option--selected .selling-plan-option__radio-custom {
+    border-color: #b8a472;
+  }
+
+  .selling-plan-option--selected .selling-plan-option__radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: #b8a472;
+    border-radius: 50%;
+  }
+
+  .selling-plan-option__title {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .selling-plan-option__savings-badge {
+    display: inline-block;
+    background-color: #e8d4b8;
+    color: #5c4a2a;
+    font-size: 0.625rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 2px;
+  }
+
+  .selling-plan-option__price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.125rem;
+  }
+
+  .selling-plan-option__price-current {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333333;
+  }
+
+  .selling-plan-option__price-compare {
+    font-size: 0.875rem;
+    color: #999999;
+    text-decoration: line-through;
+  }
+
+  .selling-plan-option__benefits {
+    list-style: none;
+    margin: 0.75rem 0 0 2rem;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .selling-plan-option__benefit {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: #555555;
+  }
+
+  .selling-plan-option__benefit-icon {
+    flex-shrink: 0;
+    color: #7a7a7a;
+  }
+
+  /* Hide Shopify's default selling plan disclaimer */
+  [data-selling-plan-description],
+  .selling-plan-description,
+  .selling-plan__description,
+  [class*="recurring"],
+  [class*="deferred"],
+  .product-form__info-text,
+  .product__text,
+  form p:has(+ .shopify-payment-button),
+  form > p:last-of-type,
+  .shopify-payment-button ~ p {
+    display: none !important;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  (function() {
+    // Remove Shopify's selling plan disclaimer if it exists
+    function removeSellingPlanDisclaimer() {
+      const disclaimerTexts = ['recurring', 'deferred', 'cancellation policy', 'authorize you to charge'];
+      document.querySelectorAll('form[action*="/cart/add"] p, form[action*="/cart/add"] small, .product-form p').forEach(el => {
+        const text = el.textContent.toLowerCase();
+        if (disclaimerTexts.some(t => text.includes(t))) {
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    // Run immediately and observe for dynamic changes
+    removeSellingPlanDisclaimer();
+    const observer = new MutationObserver(removeSellingPlanDisclaimer);
+    const form = document.querySelector('form[action*="/cart/add"]');
+    if (form) {
+      observer.observe(form, { childList: true, subtree: true });
+    }
+
+    const selectors = document.querySelectorAll('[data-selling-plan-selector]');
+
+    selectors.forEach(selector => {
+      const sellingPlanId = selector.dataset.sellingPlanId;
+      const variantPrices = JSON.parse(selector.dataset.variantPrices);
+      const options = selector.querySelectorAll('[data-option]');
+      const radios = selector.querySelectorAll('input[name="selling_plan_option"]');
+
+      // Price display elements
+      const subscriptionPriceEl = selector.querySelector('[data-subscription-price]');
+      const subscriptionCompareEl = selector.querySelector('[data-subscription-compare]');
+      const onetimePriceEl = selector.querySelector('[data-onetime-price]');
+      const onetimeCompareEl = selector.querySelector('[data-onetime-compare]');
+
+      // Button price elements
+      const buttonPriceEl = document.querySelector('[data-button-price]');
+      const buttonCompareEl = document.querySelector('[data-button-compare]');
+
+      // Find the product form to inject selling plan input
+      const productForm = document.querySelector('form[action*="/cart/add"]');
+      let sellingPlanInput = null;
+
+      if (productForm) {
+        // Create or find selling plan hidden input
+        sellingPlanInput = productForm.querySelector('input[name="selling_plan"]');
+        if (!sellingPlanInput) {
+          sellingPlanInput = document.createElement('input');
+          sellingPlanInput.type = 'hidden';
+          sellingPlanInput.name = 'selling_plan';
+          sellingPlanInput.value = sellingPlanId; // Default to subscription
+          productForm.appendChild(sellingPlanInput);
+        }
+      }
+
+      // Get current variant ID
+      function getCurrentVariantId() {
+        const variantSelect = document.querySelector('select[name="id"]');
+        const variantInput = document.querySelector('input[name="id"]');
+        return variantSelect ? variantSelect.value : (variantInput ? variantInput.value : null);
+      }
+
+      // Update button price based on selection
+      function updateButtonPrice(isSubscription) {
+        const variantId = getCurrentVariantId();
+        const prices = variantPrices[variantId];
+        if (!prices || !buttonPriceEl) return;
+
+        if (isSubscription) {
+          buttonPriceEl.textContent = prices.subscriptionFormatted;
+          if (buttonCompareEl) {
+            buttonCompareEl.textContent = prices.onetimeFormatted;
+            buttonCompareEl.style.display = 'inline-block';
+          }
+        } else {
+          buttonPriceEl.textContent = prices.onetimeFormatted;
+          if (buttonCompareEl) {
+            buttonCompareEl.style.display = 'none';
+          }
+        }
+      }
+
+      // Initialize button with subscription price (default selection)
+      updateButtonPrice(true);
+
+      // Handle option selection via radio buttons
+      radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+          const selectedValue = this.value;
+          const isSubscription = selectedValue === 'subscription';
+
+          // Update visual state
+          options.forEach(opt => {
+            opt.classList.toggle('selling-plan-option--selected', opt.dataset.option === selectedValue);
+          });
+
+          // Update hidden input
+          if (sellingPlanInput) {
+            sellingPlanInput.value = isSubscription ? sellingPlanId : '';
+          }
+
+          // Update button price
+          updateButtonPrice(isSubscription);
+        });
+      });
+
+      // Make entire option block clickable
+      options.forEach(option => {
+        option.addEventListener('click', function(e) {
+          // Don't trigger if clicking on the radio or label (they handle themselves)
+          if (e.target.closest('label') || e.target.closest('input')) return;
+
+          const radio = this.querySelector('input[type="radio"]');
+          if (radio && !radio.checked) {
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        });
+      });
+
+      // Check if subscription is currently selected
+      function isSubscriptionSelected() {
+        const checkedRadio = selector.querySelector('input[name="selling_plan_option"]:checked');
+        return checkedRadio ? checkedRadio.value === 'subscription' : true;
+      }
+
+      // Handle variant changes
+      function updatePrices(variantId) {
+        const prices = variantPrices[variantId];
+        if (!prices) return;
+
+        if (subscriptionPriceEl) {
+          subscriptionPriceEl.textContent = prices.subscriptionFormatted;
+        }
+        // Show one-time price as strikethrough for subscription option
+        if (subscriptionCompareEl) {
+          subscriptionCompareEl.textContent = prices.onetimeFormatted;
+        }
+        if (onetimePriceEl) {
+          onetimePriceEl.textContent = prices.onetimeFormatted;
+        }
+        if (onetimeCompareEl && prices.compareAtFormatted) {
+          onetimeCompareEl.textContent = prices.compareAtFormatted;
+        }
+
+        // Update button price based on current selection
+        updateButtonPrice(isSubscriptionSelected());
+      }
+
+      // Listen for variant changes from product form
+      document.addEventListener('variant:change', function(event) {
+        if (event.detail && event.detail.variantId) {
+          updatePrices(event.detail.variantId);
+        }
+      });
+
+      // Also listen for changes on variant select elements
+      const variantSelects = document.querySelectorAll('select[name="id"]');
+      variantSelects.forEach(select => {
+        select.addEventListener('change', function() {
+          updatePrices(this.value);
+        });
+      });
+    });
+  })();
+{% endjavascript %}
