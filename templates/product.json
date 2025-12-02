@@ -92,6 +92,53 @@
             "margin_top": 0,
             "margin_bottom": 0
           }
+        },
+        "collapsible_content_kD8e4Y": {
+          "type": "collapsible-content",
+          "settings": {
+            "heading": "Product Description",
+            "content_type": "text",
+            "content": "<p>Add your product details here.</p>",
+            "enable_collapsible": false,
+            "default_open": false,
+            "heading_font_size": 16,
+            "heading_line_height": 1.4,
+            "heading_text_transform": "none",
+            "content_font_size": 14,
+            "content_line_height": 1.6,
+            "content_text_transform": "none",
+            "show_border_top": true,
+            "show_border_bottom": true,
+            "border_color": "#e5e5e5",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "collapsible_content_FJNgi6": {
+          "type": "collapsible-content",
+          "settings": {
+            "heading": "Ingredients",
+            "content_type": "image",
+            "content": "<p>Add your product details here.</p>",
+            "image": "shopify://shop_images/Conception_SFP_-_RV4.webp",
+            "enable_collapsible": true,
+            "default_open": false,
+            "heading_font_size": 16,
+            "heading_line_height": 1.4,
+            "heading_text_transform": "none",
+            "content_font_size": 14,
+            "content_line_height": 1.6,
+            "content_text_transform": "none",
+            "show_border_top": true,
+            "show_border_bottom": true,
+            "border_color": "#e5e5e5",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
         }
       },
       "block_order": [
@@ -101,7 +148,9 @@
         "product_usp_rwPHif",
         "product_benefits_yhJi94",
         "selling_plan_iQqTbX",
-        "product_form_zz38nz"
+        "product_form_zz38nz",
+        "collapsible_content_kD8e4Y",
+        "collapsible_content_FJNgi6"
       ],
       "settings": {
         "gallery_width": 50,
