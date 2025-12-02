@@ -68,18 +68,6 @@
             "margin_bottom": 0
           }
         },
-        "product_form_zz38nz": {
-          "type": "product-form",
-          "settings": {
-            "show_quantity": false,
-            "show_dynamic_checkout": false,
-            "button_text": "",
-            "padding_top": 0,
-            "padding_bottom": 0,
-            "margin_top": 0,
-            "margin_bottom": 0
-          }
-        },
         "selling_plan_iQqTbX": {
           "type": "selling-plan",
           "settings": {
@@ -87,6 +75,18 @@
             "subscription_badge_text": "SAVE 25%",
             "benefits": "Save 25% your first month|Save 15% every following month|Free shipping|Pause or cancel anytime",
             "show_compare_price": true,
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "product_form_zz38nz": {
+          "type": "product-form",
+          "settings": {
+            "show_quantity": false,
+            "show_dynamic_checkout": true,
+            "button_text": "",
             "padding_top": 0,
             "padding_bottom": 0,
             "margin_top": 0,
@@ -100,8 +100,8 @@
         "product_subtitle_YqVda7",
         "product_usp_rwPHif",
         "product_benefits_yhJi94",
-        "product_form_zz38nz",
-        "selling_plan_iQqTbX"
+        "selling_plan_iQqTbX",
+        "product_form_zz38nz"
       ],
       "settings": {
         "gallery_width": 50,
