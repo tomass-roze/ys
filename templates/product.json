@@ -96,10 +96,10 @@
         "collapsible_content_kD8e4Y": {
           "type": "collapsible-content",
           "settings": {
-            "heading": "Product Description",
+            "heading": "Subscriber Perks",
             "content_type": "text",
-            "content": "<p>Add your product details here.</p>",
-            "enable_collapsible": false,
+            "content": "<p>Let’s make it official. Become a monthly subscriber and let us do the heavy lifting for you.</p><p>When you subscribe to Perelel, you unlock access to exclusive perks. Here’s what you can expect:</p><ul><li>Get 15% off your order every month</li><li>Enjoy free shipping on subscriptions over $39.50</li><li>Ability to swap, pause or cancel your subscription at any time</li><li>First access to expert-led classes and community events</li><li>Exclusive offers + discounts from brands you love</li><li>Doctor-backed content for your exact life stage </li><li>Feel good factor: For every new pack subscription, we'll donate in your honor via our giveback program</li></ul>",
+            "enable_collapsible": true,
             "default_open": false,
             "heading_font_size": 16,
             "heading_line_height": 1.4,
