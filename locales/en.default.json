@@ -168,7 +168,9 @@
     "layout": "Layout",
     "style": "Style",
     "alignment": "Alignment",
-    "text_style": "Text style"
+    "text_style": "Text style",
+    "heading": "Heading",
+    "heading_level": "Heading level"
   },
   "options": {
     "size": {

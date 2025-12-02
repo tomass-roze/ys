@@ -27,6 +27,7 @@
     "footer": "Footer",
     "group": "Group",
     "header": "Header",
+    "heading": "Heading",
     "layout": "Layout",
     "main": "Main",
     "menu": {
@@ -321,6 +322,30 @@
         "name": "Unique selling points",
         "selling_points": "Selling points",
         "selling_points_info": "Separate each selling point with a pipe character (|)"
+      }
+    }
+  },
+  "sections": {
+    "text_with_image": {
+      "name": "Image with text",
+      "settings": {
+        "image_position": {
+          "label": "Image position",
+          "options": {
+            "left": "Left",
+            "right": "Right"
+          }
+        },
+        "image_width": {
+          "label": "Image width"
+        },
+        "gap": {
+          "label": "Gap between image and content"
+        },
+        "content_alignment": {
+          "label": "Content alignment"
+        },
+        "spacing_header": "Spacing"
       }
     }
   }

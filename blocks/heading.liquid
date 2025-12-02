@@ -1,0 +1,98 @@
+{% doc %}
+  Renders a heading block with configurable text, size, and alignment.
+
+  @example
+  {% content_for 'block', type: 'heading', id: 'heading' %}
+{% enddoc %}
+
+{% liquid
+  assign tag = 'h' | append: block.settings.heading_level
+%}
+
+<{{ tag }}
+  class="heading {{ block.settings.text_style }}"
+  style="
+    --text-align: {{ block.settings.alignment }};
+    --font-size: {{ block.settings.font_size }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  {{ block.settings.text }}
+</{{ tag }}>
+
+{% stylesheet %}
+  .heading {
+    text-align: var(--text-align);
+    font-size: var(--font-size);
+    margin: 0;
+    line-height: 1.2;
+  }
+  .heading--title {
+    font-weight: 700;
+  }
+  .heading--subtitle {
+    font-weight: 600;
+  }
+  .heading--normal {
+    font-weight: 400;
+  }
+  .heading--uppercase {
+    text-transform: uppercase;
+  }
+  .heading--bold {
+    font-weight: 700;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:general.heading",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:labels.heading",
+      "default": "Heading text"
+    },
+    {
+      "type": "range",
+      "id": "heading_level",
+      "label": "t:labels.heading_level",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "text_style",
+      "label": "t:labels.text_style",
+      "options": [
+        { "value": "heading--title", "label": "t:options.text_style.title" },
+        { "value": "heading--subtitle", "label": "t:options.text_style.subtitle" },
+        { "value": "heading--normal", "label": "t:options.text_style.normal" },
+        { "value": "heading--uppercase", "label": "t:options.text_style.uppercase" },
+        { "value": "heading--bold", "label": "t:options.text_style.bold" }
+      ],
+      "default": "heading--title"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "t:labels.font_size",
+      "min": 12,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "text_alignment",
+      "id": "alignment",
+      "label": "t:labels.alignment",
+      "default": "left"
+    }
+  ],
+  "presets": [{ "name": "t:general.heading" }]
+}
+{% endschema %}

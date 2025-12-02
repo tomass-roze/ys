@@ -1,0 +1,199 @@
+<div
+  class="text-with-image {{ section.settings.layout }}"
+  style="
+    --gap: {{ section.settings.gap }}px;
+    --image-width: {{ section.settings.image_width }}%;
+    --content-alignment: {{ section.settings.content_alignment }};
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="text-with-image__container">
+    {% if section.settings.image %}
+      <div class="text-with-image__image">
+        {% render 'image',
+          image: section.settings.image,
+          width: 1200,
+          css_class: 'text-with-image__img'
+        %}
+      </div>
+    {% endif %}
+
+    <div class="text-with-image__content">
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .text-with-image {
+    padding-top: var(--padding-top);
+    padding-bottom: var(--padding-bottom);
+    width: 100%;
+  }
+
+  .text-with-image__container {
+    display: flex;
+    gap: var(--gap);
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .text-with-image--image-left .text-with-image__container {
+    flex-direction: row;
+  }
+
+  .text-with-image--image-right .text-with-image__container {
+    flex-direction: row-reverse;
+  }
+
+  .text-with-image__image {
+    flex: 0 0 var(--image-width);
+    overflow: hidden;
+  }
+
+  .text-with-image__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: var(--content-alignment);
+  }
+
+  @media (max-width: 768px) {
+    .text-with-image__container {
+      flex-direction: column !important;
+    }
+
+    .text-with-image__image {
+      flex: 0 0 auto;
+      width: 100%;
+    }
+
+    .text-with-image__content {
+      align-items: flex-start;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.text_with_image.name",
+  "blocks": [
+    { "type": "heading" },
+    { "type": "text" },
+    { "type": "button" },
+    { "type": "@theme" }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:labels.images_header"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.desktop_image"
+    },
+    {
+      "type": "header",
+      "content": "t:labels.layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "t:sections.text_with_image.settings.image_position.label",
+      "options": [
+        { "value": "text-with-image--image-left", "label": "t:sections.text_with_image.settings.image_position.options.left" },
+        { "value": "text-with-image--image-right", "label": "t:sections.text_with_image.settings.image_position.options.right" }
+      ],
+      "default": "text-with-image--image-left"
+    },
+    {
+      "type": "range",
+      "id": "image_width",
+      "label": "t:sections.text_with_image.settings.image_width.label",
+      "min": 30,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:sections.text_with_image.settings.gap.label",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "t:sections.text_with_image.settings.content_alignment.label",
+      "options": [
+        { "value": "flex-start", "label": "t:options.alignment.left" },
+        { "value": "center", "label": "t:options.alignment.center" },
+        { "value": "flex-end", "label": "t:options.alignment.right" }
+      ],
+      "default": "flex-start"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.text_with_image.settings.spacing_header"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:labels.padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:labels.padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.text_with_image.name",
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": {
+            "text": "Image with text",
+            "heading_level": 2,
+            "font_size": 32
+          }
+        },
+        {
+          "type": "text",
+          "settings": {
+            "text": "Pair text with an image to give customers insight into your brand. Tell a story, explain a product detail, or describe a new promotion."
+          }
+        },
+        {
+          "type": "button",
+          "settings": {
+            "label": "Shop now",
+            "button_style": "button--primary"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
