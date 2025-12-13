@@ -1,0 +1,165 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "product",
+      "blocks": {
+        "review_stars_GfGqXz": {
+          "type": "review-stars",
+          "settings": {
+            "rating": 4.5,
+            "star_color": "#b8860b",
+            "review_text": "4.9/5.0 (2,127 Reviews)",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "product_title_yt3Y49": {
+          "type": "product-title",
+          "settings": {
+            "heading_level": "h1",
+            "title_size": "product-title--medium",
+            "alignment": "left",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "product_subtitle_YqVda7": {
+          "type": "product-subtitle",
+          "settings": {
+            "text": "Prepare your body for pregnancy",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "product_usp_rwPHif": {
+          "type": "product-usp",
+          "settings": {
+            "selling_points": "Clinically Proven|Pregnancy Prep|Egg Health",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "product_benefits_yhJi94": {
+          "type": "product-benefits",
+          "settings": {
+            "title": "",
+            "benefits": "Formulated by top fertility doctors|Clinically proven to increase key nutrient levels|Designed for those trying to get pregnant|Supports fertility and egg health|No nausea formula",
+            "style": "product-benefits--none",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "selling_plan_iQqTbX": {
+          "type": "selling-plan",
+          "settings": {
+            "recommended_label": "RECOMMENDED",
+            "subscription_badge_text": "SAVE 25%",
+            "benefits": "Save 25% your first month|Save 15% every following month|Free shipping|Pause or cancel anytime",
+            "show_compare_price": true,
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "product_form_zz38nz": {
+          "type": "product-form",
+          "settings": {
+            "show_quantity": false,
+            "show_dynamic_checkout": true,
+            "button_text": "",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "collapsible_content_kD8e4Y": {
+          "type": "collapsible-content",
+          "settings": {
+            "heading": "Subscriber Perks",
+            "content_type": "text",
+            "content": "<p>Let’s make it official. Become a monthly subscriber and let us do the heavy lifting for you.</p><p>When you subscribe to Perelel, you unlock access to exclusive perks. Here’s what you can expect:</p><ul><li>Get 15% off your order every month</li><li>Enjoy free shipping on subscriptions over $39.50</li><li>Ability to swap, pause or cancel your subscription at any time</li><li>First access to expert-led classes and community events</li><li>Exclusive offers + discounts from brands you love</li><li>Doctor-backed content for your exact life stage </li><li>Feel good factor: For every new pack subscription, we'll donate in your honor via our giveback program</li></ul>",
+            "enable_collapsible": true,
+            "default_open": false,
+            "heading_font_size": 16,
+            "heading_line_height": 1.4,
+            "heading_text_transform": "none",
+            "content_font_size": 14,
+            "content_line_height": 1.6,
+            "content_text_transform": "none",
+            "show_border_top": true,
+            "show_border_bottom": true,
+            "border_color": "#e5e5e5",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        },
+        "collapsible_content_FJNgi6": {
+          "type": "collapsible-content",
+          "settings": {
+            "heading": "Ingredients",
+            "content_type": "image",
+            "content": "<p>Add your product details here.</p>",
+            "image": "shopify://shop_images/Conception_SFP_-_RV4.webp",
+            "enable_collapsible": true,
+            "default_open": false,
+            "heading_font_size": 16,
+            "heading_line_height": 1.4,
+            "heading_text_transform": "none",
+            "content_font_size": 14,
+            "content_line_height": 1.6,
+            "content_text_transform": "none",
+            "show_border_top": true,
+            "show_border_bottom": true,
+            "border_color": "#e5e5e5",
+            "padding_top": 0,
+            "padding_bottom": 0,
+            "margin_top": 0,
+            "margin_bottom": 0
+          }
+        }
+      },
+      "block_order": [
+        "review_stars_GfGqXz",
+        "product_title_yt3Y49",
+        "product_subtitle_YqVda7",
+        "product_usp_rwPHif",
+        "product_benefits_yhJi94",
+        "selling_plan_iQqTbX",
+        "product_form_zz38nz",
+        "collapsible_content_kD8e4Y",
+        "collapsible_content_FJNgi6"
+      ],
+      "settings": {
+        "gallery_width": 50,
+        "content_max_width": 440,
+        "block_spacing": 20
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
